@@ -16,7 +16,6 @@
         >
           HSC Result Admin
         </h1>
-
         <div>
           <div
             id="exampleWrapper"
