@@ -2,9 +2,11 @@
   import { Toggle, Fileupload, Label } from "flowbite-svelte";
 </script>
 
-<div class="flex justify-center items-center bg-gray-200 m-2 rounded-lg">
-  <div class="text-2xl mt-4 border-b-2 font-semibold">
-    HSC Result <span class="text-4xl text-primary-600 font-bold">Admin</span>Panel
+<div class="flex bg-gray-200 m-2 rounded-lg">
+  <div
+    class="text-2xl mt-4 border-b-2 font-semibold flex justify-center item-center"
+  >
+    HSC Result <span class="text-2xl text-primary-600 font-bold">Admin</span> Panel
   </div>
 </div>
 
@@ -168,6 +170,9 @@
 </div>
 <div>
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4 m-4">
+    <div class="flex m-4 font-bold bg-gray-200 p-2 rounded-md">
+      Uploaded Result CSV Data
+    </div>
     <table
       class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
     >
@@ -176,8 +181,15 @@
       >
         <tr>
           <th scope="col" class="px-6 py-3"> File Name </th>
+          <th scope="col" class="px-6 py-3"> Total </th>
+          <th scope="col" class="px-6 py-3"> Pass </th>
+          <th scope="col" class="px-6 py-3"> RES </th>
+          <th scope="col" class="px-6 py-3"> DEB </th>
+          <th scope="col" class="px-6 py-3"> GRD </th>
+          <th scope="col" class="px-6 py-3"> ISO </th>
+          <th scope="col" class="px-6 py-3"> FFF </th>
           <th scope="col" class="px-6 py-3"> Status </th>
-          <th scope="col" class="px-6 py-3"> View </th>
+          <th scope="col" class="px-6 py-3"> Action</th>
         </tr>
       </thead>
       <tbody>
@@ -188,16 +200,63 @@
             scope="row"
             class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-           HSCData.CSV
+            HSCData.CSV
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
           </th>
           <td class="px-6 py-4">-</td>
-          
 
-          <td class="px-6 py-4">    
+          <td class="px-6 py-4">
             <a
               href="#"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
               >View</a
+            >
+          </td>
+          <td class="px-6 py-4">
+            <button class="bg-primary-400 p-2 rounded-lg text-white"
+              >Insert To Db</button
             >
           </td>
         </tr>
@@ -208,16 +267,67 @@
             scope="row"
             class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-           subjectMaster.csv
+            subjectMaster.csv
           </th>
-          <td class="px-6 py-4"> - </td>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <th
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
+            100
+          </th>
+          <td class="px-6 py-4">-</td>
+
           <td class="px-6 py-4">
             <a
-              href="/"
+              href="#"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
               >View</a
             >
           </td>
+          <td class="px-6 py-4">
+            <button class="bg-primary-400 p-2 rounded-lg text-white"
+              >Insert To Db</button
+            >
+          </td>
+
+          <td class="px-6 py-4"> - </td>
         </tr>
       </tbody>
     </table>
