@@ -313,7 +313,7 @@
       </div>
       <button
         on:click={handleUpload}
-        class="p-2 px-6 font-bold bg-primary-400 rounded-md mt-2 text-white"
+        class="p-2 px-6 font-bold bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
         >Upload</button
       >
 
@@ -394,12 +394,12 @@
               <td class="px-6 py-4">Pending</td>
 
               <td class="px-6 py-4">
-                <button class="bg-primary-400 p-2 rounded-lg text-white"
+                <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >Insert To DB</button
                 >
               </td>
               <td class="px-6 py-4">
-                <button class="bg-primary-400 p-2 rounded-lg text-white">
+                <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -443,7 +443,7 @@
       </div>
       <button
         on:click={uploadSubjectMaster}
-        class="p-2 font-bold px-6 bg-primary-400 rounded-md mt-2 text-white"
+        class="p-2 font-bold px-6 bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
         >Upload</button
       >
     </div>
@@ -522,15 +522,15 @@
               100
             </th>
 
-            <td class="px-6 py-4">-</td>
+            <td class="px-6 py-4">Pending</td>
             <td class="px-6 py-4">
-              <button class="bg-primary-400 p-2 rounded-lg text-white"
+              <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                 >Insert To DB</button
               >
             </td>
 
             <td class="px-6 py-4">
-              <button class="bg-primary-400 p-2 rounded-lg text-white">
+              <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -573,7 +573,7 @@
       </div>
       <button
         on:click={uploadDivisionMaster}
-        class="p-2 font-bold px-6 bg-primary-400 rounded-md mt-2 text-white"
+        class="p-2 font-bold px-6 bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
         >Upload</button
       >
     </div>
@@ -651,15 +651,15 @@
             >
               100
             </th>
-            <td class="px-6 py-4">-</td>
+            <td class="px-6 py-4">Pending</td>
 
             <td class="px-6 py-4">
-              <button class="bg-primary-400 p-2 rounded-lg text-white"
+              <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                 >Insert To DB</button
               >
             </td>
             <td class="px-6 py-4">
-              <button class="bg-primary-400 p-2 rounded-lg text-white">
+              <button class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
