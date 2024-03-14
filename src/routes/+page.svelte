@@ -1,6 +1,7 @@
 <script>
   import { FloatingLabelInput, Helper } from "flowbite-svelte";
   import { goto } from "$app/navigation";
+  let sendotp = false;
 </script>
 
 <div class="bg-gray-50 dark:bg-gray-900">
@@ -30,20 +31,32 @@
               Mobile Number
             </FloatingLabelInput>
           </div>
+
+          <div>
+            <button
+            on:click={()=>{
+              sendotp=true;
+            }}
+            class="px-2 py-2 mt-2 rounded-lg text-white bg-primary-400"
+              >Send OTP</button
+            >
+          </div>
         </div>
-        <div
-          id="exampleWrapper"
-          class="grid gap-6 items-end w-full md:grid-cols-1"
-        >
-          <FloatingLabelInput
-            style="outlined"
-            id="floating_outlined1"
-            name="floating_outlined"
-            type="text"
+        {#if sendotp}
+          <div
+            id="exampleWrapper"
+            class="grid gap-6 items-end w-full md:grid-cols-1"
           >
-            Enter OTP
-          </FloatingLabelInput>
-        </div>
+            <FloatingLabelInput
+              style="outlined"
+              id="floating_outlined1"
+              name="floating_outlined"
+              type="text"
+            >
+              Enter OTP
+            </FloatingLabelInput>
+          </div>
+        {/if}
 
         <div class="flex justify-center items-center">
           <button

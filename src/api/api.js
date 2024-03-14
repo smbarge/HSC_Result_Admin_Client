@@ -105,10 +105,80 @@ const getDbStats = async () => {
   }
 };
 
+const getResultCSVFilesData = async () => {
+  try {
+    const { error, errorMsg, files } = await getResultCSVFiles();
+    if (error) return { error, errorMsg };
+    console.log("files is: ", files)
+    let promises = files.map(async (file) => {
+      const { error, errorMsg, stats } = await getCSVFilesData({ fileName: file });
+      return {fileName: file, ...stats}
+    });
+    let data = await Promise.all(promises)
+    return {error: 0, errorMsg: "", data}
+  } catch (e) {
+
+    return {error: -1, errorMsg: "exception in processing result csv files : ", e}
+  }
+};
+
+const getResultCSVFiles = async () => {
+  let url = new URL(`${apiServer}/csv/result`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { files } = responseResult;
+    console.log("files :", files);
+    return { error: 0, errorMsg: "", files };
+  } catch (e) {
+    console.log("api.getResultCSVFiles:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+const getCSVFilesData = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/csv/result/stats/${fileName}`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { filename, stats } = responseResult;
+    console.log("filesname :", filename);
+    return { error: 0, errorMsg: "", filename, stats };
+  } catch (e) {
+    console.log("api.getCSVFileData:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
 export let api = {
   getDbStats,
   uploadResult,
   uploadSubjectMaster,
   uploadDivisionMaster,
-
+  getResultCSVFilesData,
 };
