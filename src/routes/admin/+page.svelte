@@ -13,7 +13,7 @@
     //   DEB: "140",
     //   GRD: "120",
     //   ISO: "120",
-    //   FFF: "10",
+    //   FFF: "10",/
     // },
     // {
     //   fileName: "Result_Data__Pune_2024.csv",
@@ -37,8 +37,8 @@
       errorMsg: lerrorMsg,
       data,
     } = await api.getResultCSVFilesData();
-    console.log("csv files data is: ", data)
-    resultData = [...data]
+    console.log("csv files data is: ", data);
+    resultData = [...data];
     dbStats = { ..._stats };
 
     dataLoaded = true;
@@ -55,13 +55,15 @@
     { name: "Latur", div: 8 },
     { name: "Kokan", div: 9 },
   ];
-  let selectedFile;
+  let selectedFile ="";
+  let selectedFiles = []
   const handleFileChange = (e) => {
     selectedFile = e.target.files[0];
     console.log("selected file :", selectedFile);
   };
 
   const handleUpload = async () => {
+    try {
     if (selectedFile) {
       const { error, errorMsg, path } = await api.uploadResult({
         fileName: selectedFile,
@@ -80,6 +82,20 @@
       selectedFile = null;
     } else {
       console.error("no file selected");
+    }
+
+    } catch(e) {
+      console.log("exception in processing handleUpload")
+    } finally {
+    const {
+      error,
+      errorMsg,
+      data,
+    } = await api.getResultCSVFilesData();
+    if(error) return 
+    resultData = [...data];
+    console.log("resultData is: ", resultData)
+
     }
   };
   const uploadSubjectMaster = async () => {
@@ -128,25 +144,27 @@
   let responseData = null;
   let error = null;
 
-  async function fetchData() {
+  const handleDelete = async (fileName) => {
+    console.log("handle delete called", fileName);
     try {
-      const response = await fetch(
-        "http://localhost:3000/csv/result/stats/hscdata.csv"
-      );
-      if (response.ok) {
-        responseData = await response.json();
-        console.log("responseData is", responseData);
-        error = null;
+      console.log("handle delete called");
+      // const filename = 'your-file-name';
+      // const response = await deleteFile(filename);
+      const response = await api.deleteCSVFiles({ fileName });
+
+      if (response.success) {
+        console.log("File deleted successfully");
       } else {
-        error = `Error: ${response.status} - ${response.statusText}`;
-        responseData = null;
+        console.error("Failed to delete file:", response.error);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
-      error = "Error fetching data. Please try again later.";
-      responseData = null;
+      console.error("Error deleting file:", error);
+    } finally {
+      const { error, errorMsg, data } = await api.getResultCSVFilesData();
+      if(error ) return ; // handle error
+      resultData = [...data];
     }
-  }
+  };
 </script>
 
 <!-- <button on:click={fetchData}>getdata</button> -->
@@ -330,8 +348,14 @@
       <div class="text-2xl font-bold flex justify-center items-center">
         Upload Result CSV
       </div>
-      <Label class="pb-2" for="small_size">Upload CSV Result</Label>
-      <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
+
+<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
+<input 
+on:change={handleFileChange}
+class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file">
+
+      <!-- <Label class="pb-2" for="small_size">Upload CSV Result</Label>
+      <Fileupload id="small_size" size="sm" on:change={handleFileChange} /> -->
       <div class="ml-2 text-blue-700 flex gap-2 mt-2">
         HSC_Result_Data
         <span class="">
@@ -429,7 +453,7 @@
                 >
                   {data.FFF}
                 </th>
-                <td class="px-6 py-4">Pending</td>
+                <td class="px-6 py-4">-</td>
 
                 <td class="px-6 py-4">
                   <button
@@ -439,6 +463,9 @@
                 </td>
                 <td class="px-6 py-4">
                   <button
+                    on:click={() => {
+                      handleDelete(data.fileName);
+                    }}
                     class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >
                     <svg
