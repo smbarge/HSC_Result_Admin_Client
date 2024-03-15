@@ -127,6 +127,27 @@ const getResultCSVFilesData = async () => {
     };
   }
 };
+const getSubjectMasterCSVFilesData = async () => {
+  try {
+    const { error, errorMsg, files } = await getSubjectMasterCSVFiles();
+    if (error) return { error, errorMsg };
+    console.log("files is: ", files);
+    let promises = files.map(async (file) => {
+      const { error, errorMsg, stats } = await getSubjectMasterData({
+        fileName: file,
+      });
+      return { fileName: file, ...stats };
+    });
+    let data = await Promise.all(promises);
+    return { error: 0, errorMsg: "", data };
+  } catch (e) {
+    return {
+      error: -1,
+      errorMsg: "exception in processing result csv files : ",
+      e,
+    };
+  }
+};
 
 const getResultCSVFiles = async () => {
   let url = new URL(`${apiServer}/csv/result`);
@@ -154,6 +175,7 @@ const getResultCSVFiles = async () => {
     return { error: -1, errorMsg: e };
   }
 };
+
 const getCSVFilesData = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/result/stats/${fileName}`);
   console.log("url: ", url);
@@ -180,11 +202,65 @@ const getCSVFilesData = async ({ fileName }) => {
     return { error: -1, errorMsg: e };
   }
 };
+
+const getSubjectMasterCSVFiles = async () => {
+  let url = new URL(`${apiServer}/csv/subjectMaster`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { files } = responseResult;
+    console.log("files :", files);
+    return { error: 0, errorMsg: "", files };
+  } catch (e) {
+    console.log("api.getSubjectMasterCSVFiles:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+const getSubjectMasterData = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/csv/subjectMaster/stats/${fileName}`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { filename, stats } = responseResult;
+    console.log("filesname :", filename);
+    return { error: 0, errorMsg: "", filename, stats };
+  } catch (e) {
+    console.log("api.getSubjectMasterData:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
 const deleteCSVFiles = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/result/${fileName}`);
   console.log("url: ", url);
 
-   try {
+  try {
     let response = await fetch(url.toString(), {
       method: "DELETE",
       headers: {
@@ -193,34 +269,56 @@ const deleteCSVFiles = async ({ fileName }) => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete file');
+      throw new Error("Failed to delete file");
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error("Error deleting file:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+const deleteSubjectMasterCSVFiles = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/csv/subjectMaster/${fileName}`);
+  console.log("url: ", url);
+
+  try {
+    let response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete file");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting_Subject_Master file:", error);
     return { success: false, error: error.message };
   }
 };
 // api.js
 
-export async function deleteFile(filename) {
-  try {
-    const response = await fetch(`http://your-server/result/${filename}`, {
-      method: 'DELETE',
-    });
+// export async function deleteFile(filename) {
+//   try {
+//     const response = await fetch(`http://your-server/result/${filename}`, {
+//       method: 'DELETE',
+//     });
 
-    if (!response.ok) {
-      throw new Error('Failed to delete file');
-    }
+//     if (!response.ok) {
+//       throw new Error('Failed to delete file');
+//     }
 
-    return { success: true };
-  } catch (error) {
-    console.error('Error deleting file:', error);
-    return { success: false, error: error.message };
-  }
-}
-
+//     return { success: true };
+//   } catch (error) {
+//     console.error('Error deleting file:', error);
+//     return { success: false, error: error.message };
+//   }
+// }
 
 export let api = {
   getDbStats,
@@ -229,4 +327,8 @@ export let api = {
   uploadDivisionMaster,
   getResultCSVFilesData,
   deleteCSVFiles,
+  getSubjectMasterCSVFiles,
+  getSubjectMasterData,
+  getSubjectMasterCSVFilesData,
+  deleteSubjectMasterCSVFiles,
 };

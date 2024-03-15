@@ -3,29 +3,10 @@
   import { api } from "../../api/api";
   import { onMount } from "svelte";
   import { Spinner } from "flowbite-svelte";
+  import { flip } from "svelte/animate";
 
-  let resultData = [
-    // {
-    //   fileName: "Result_Data_2024.csv",
-    //   TOTAL: "600",
-    //   PAS: "120",
-    //   RES: "140",
-    //   DEB: "140",
-    //   GRD: "120",
-    //   ISO: "120",
-    //   FFF: "10",/
-    // },
-    // {
-    //   fileName: "Result_Data__Pune_2024.csv",
-    //   TOTAL: "600",
-    //   PAS: "120",
-    //   RES: "140",
-    //   DEB: "140",
-    //   GRD: "120",
-    //   ISO: "120",
-    //   FFF: "10",
-    // },
-  ];
+  let resultData = [];
+  let subjectMaster = [];
 
   let dbStats = {};
   let dataLoaded = false;
@@ -37,8 +18,16 @@
       errorMsg: lerrorMsg,
       data,
     } = await api.getResultCSVFilesData();
+    const {
+      error: lerror2,
+      errorMsg: errorMsg2,
+      data: ldata,
+    } = await api.getSubjectMasterCSVFilesData();
+    console.log("subjectMaster data..", ldata);
+
     console.log("csv files data is: ", data);
     resultData = [...data];
+    subjectMaster = [...ldata];
     dbStats = { ..._stats };
 
     dataLoaded = true;
@@ -55,8 +44,8 @@
     { name: "Latur", div: 8 },
     { name: "Kokan", div: 9 },
   ];
-  let selectedFile ="";
-  let selectedFiles = []
+  let selectedFile = "";
+  let selectedFiles = [];
   const handleFileChange = (e) => {
     selectedFile = e.target.files[0];
     console.log("selected file :", selectedFile);
@@ -64,59 +53,66 @@
 
   const handleUpload = async () => {
     try {
-    if (selectedFile) {
-      const { error, errorMsg, path } = await api.uploadResult({
-        fileName: selectedFile,
-      });
-      if (error) {
-        console.log(
-          "failed to uploaded result file: ",
-          selectedFile,
-          "error is : ",
-          errorMsg
-        );
+      if (selectedFile) {
+        const { error, errorMsg, path } = await api.uploadResult({
+          fileName: selectedFile,
+        });
+        if (error) {
+          console.log(
+            "failed to uploaded result file: ",
+            selectedFile,
+            "error is : ",
+            errorMsg
+          );
+          selectedFile = null;
+          return;
+        }
+        console.log("uploding file :", selectedFile);
         selectedFile = null;
-        return;
+      } else {
+        console.error("no file selected");
       }
-      console.log("uploding file :", selectedFile);
-      selectedFile = null;
-    } else {
-      console.error("no file selected");
-    }
-
-    } catch(e) {
-      console.log("exception in processing handleUpload")
+    } catch (e) {
+      console.log("exception in processing handleUpload");
     } finally {
-    const {
-      error,
-      errorMsg,
-      data,
-    } = await api.getResultCSVFilesData();
-    if(error) return 
-    resultData = [...data];
-    console.log("resultData is: ", resultData)
-
+      const { error, errorMsg, data } = await api.getResultCSVFilesData();
+      if (error) return;
+      resultData = [...data];
+      console.log("resultData is: ", resultData);
     }
   };
   const uploadSubjectMaster = async () => {
-    if (selectedFile) {
-      const { error, errorMsg, path } = await api.uploadSubjectMaster({
-        fileName: selectedFile,
-      });
-      if (error) {
-        console.log(
-          "failed to uploaded result file: ",
-          selectedFile,
-          "error is : ",
-          errorMsg
-        );
+    try {
+      if (selectedFile) {
+        const { error, errorMsg, path } = await api.uploadSubjectMaster({
+          fileName: selectedFile,
+        });
+        if (error) {
+          console.log(
+            "failed to uploaded result file: ",
+            selectedFile,
+            "error is : ",
+            errorMsg
+          );
+          selectedFile = null;
+          return;
+        }
+        console.log("uploding file :", selectedFile);
         selectedFile = null;
-        return;
+      } else {
+        console.error("no file selected");
       }
-      console.log("uploding file :", selectedFile);
-      selectedFile = null;
-    } else {
-      console.error("no file selected");
+    } catch (error) {
+      console.log("exception in processing handleUpload");
+    } finally {
+      const {
+        error,
+        errorMsg,
+        data: ldata,
+      } = await api.getSubjectMasterCSVFilesData();
+      if (error) return;
+      subjectMaster = [...ldata];
+      console.log("resultData is: ", subjectMaster);
     }
   };
   const uploadDivisionMaster = async () => {
@@ -161,12 +157,38 @@
       console.error("Error deleting file:", error);
     } finally {
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
-      if(error ) return ; // handle error
+      if (error) return; // handle error
       resultData = [...data];
+    }
+  };
+  const handleSubjectMasterDelete = async (fileName) => {
+    console.log("handlesubjectMAster delete called", fileName);
+    try {
+      console.log("handle subjectMaster delete called");
+      // const filename = 'your-file-name';
+      // const response = await deleteFile(filename);
+      const response = await api.deleteSubjectMasterCSVFiles({ fileName });
+
+      if (response.success) {
+        console.log("File deleted successfully");
+      } else {
+        console.error("Failed to delete file:", response.error);
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    } finally {
+      const {
+        error,
+        errorMsg,
+        data: ldata,
+      } = await api.getSubjectMasterCSVFilesData();
+      if (error) return; // handle error
+      subjectMaster = [...ldata];
     }
   };
 </script>
 
+{JSON.stringify(subjectMaster)}
 <!-- <button on:click={fetchData}>getdata</button> -->
 <div class="flex bg-gray-200 m-2 rounded-lg">
   <div
@@ -349,16 +371,12 @@
         Upload Result CSV
       </div>
 
-<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
-<input 
-on:change={handleFileChange}
-class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file">
+      <Label class="pb-2" for="small_size">Upload CSV Result</Label>
+      <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
 
-      <!-- <Label class="pb-2" for="small_size">Upload CSV Result</Label>
-      <Fileupload id="small_size" size="sm" on:change={handleFileChange} /> -->
       <div class="ml-2 text-blue-700 flex gap-2 mt-2">
-        HSC_Result_Data
-        <span class="">
+        <!-- HSC_Result_Data -->
+        <!-- <span class="">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -371,7 +389,7 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
               clip-rule="evenodd"
             />
           </svg>
-        </span>
+        </span> -->
       </div>
       <button
         on:click={handleUpload}
@@ -497,7 +515,7 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
       <Label class="pb-2" for="small_size">Upload Subject Master</Label>
       <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
       <div class="ml-2 text-blue-700 flex gap-2 mt-2">
-        HSC_Result_Data
+        <!-- HSC_Result_Data
         <span class="">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -511,7 +529,7 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
               clip-rule="evenodd"
             />
           </svg>
-        </span>
+        </span> -->
       </div>
       <button
         on:click={uploadSubjectMaster}
@@ -529,98 +547,95 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
           <tr>
             <th scope="col" class="px-6 py-3"> File Name </th>
             <th scope="col" class="px-6 py-3"> Total </th>
-            <th scope="col" class="px-6 py-3"> Pass </th>
-            <th scope="col" class="px-6 py-3"> RES </th>
-            <th scope="col" class="px-6 py-3"> DEB </th>
-            <th scope="col" class="px-6 py-3"> GRD </th>
-            <th scope="col" class="px-6 py-3"> ISO </th>
-            <th scope="col" class="px-6 py-3"> FFF </th>
-            <th scope="col" class="px-6 py-3"> Status </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> status </th>
             <th scope="col" class="px-6 py-3"> </th>
             <th scope="col" class="px-6 py-3"> </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
-          >
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          {#each subjectMaster as subdata}
+            <tr
+              class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
             >
-              HSCData.CSV
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-
-            <td class="px-6 py-4">Pending</td>
-            <td class="px-6 py-4">
-              <button
-                class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
-                >Insert To DB</button
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-            </td>
-
-            <td class="px-6 py-4">
-              <button
-                class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                {subdata.fileName}
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="w-6 h-6"
+                {subdata.TOTAL}
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+
+              <td class="px-6 py-4">Pending</td>
+              <td class="px-6 py-4">
+                <button
+                  class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                  >Insert To DB</button
                 >
-                  <path
-                    fill-rule="evenodd"
-                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-            </td>
-          </tr>
+              </td>
+
+              <td class="px-6 py-4">
+                <button
+                  on:click={handleSubjectMasterDelete(subdata.fileName)}
+                  class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          {/each}
         </tbody>
       </table>
     </div>
@@ -632,9 +647,10 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
       </div>
       <Label class="pb-2" for="small_size">Upload Division Master</Label>
       <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
+
       <div class="ml-2 text-blue-700 flex gap-2 mt-2">
-        HSC_Result_Data
-        <span class="">
+        <!-- HSC_Result_Data -->
+        <!-- <span class="">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -647,7 +663,7 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
               clip-rule="evenodd"
             />
           </svg>
-        </span>
+        </span> -->
       </div>
       <button
         on:click={uploadDivisionMaster}
@@ -665,12 +681,12 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
           <tr>
             <th scope="col" class="px-6 py-3"> File Name </th>
             <th scope="col" class="px-6 py-3"> Total </th>
-            <th scope="col" class="px-6 py-3"> Pass </th>
-            <th scope="col" class="px-6 py-3"> RES </th>
-            <th scope="col" class="px-6 py-3"> DEB </th>
-            <th scope="col" class="px-6 py-3"> GRD </th>
-            <th scope="col" class="px-6 py-3"> ISO </th>
-            <th scope="col" class="px-6 py-3"> FFF </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
+            <th scope="col" class="px-6 py-3"> </th>
             <th scope="col" class="px-6 py-3"> Status </th>
             <th scope="col" class="px-6 py-3"> </th>
             <th scope="col" class="px-6 py-3"> </th>
@@ -696,38 +712,32 @@ class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg curs
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
 
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              100
             </th>
             <td class="px-6 py-4">Pending</td>
 
