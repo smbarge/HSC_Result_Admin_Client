@@ -7,6 +7,7 @@
 
   let resultData = [];
   let subjectMaster = [];
+  let divisionMaster = [];
 
   let dbStats = {};
   let dataLoaded = false;
@@ -23,11 +24,22 @@
       errorMsg: errorMsg2,
       data: ldata,
     } = await api.getSubjectMasterCSVFilesData();
+
+    const {
+      error: lerror3,
+      errorMsg: errorMsg3,
+      data: diviData,
+    } = await api.getDivisionMasterCSVFilesData();
+
+    // const divisionRep = await api.getDivisionMasterCSVFiles();
+    // console.log("division master file",divisionRep)
     console.log("subjectMaster data..", ldata);
 
     console.log("csv files data is: ", data);
     resultData = [...data];
+
     subjectMaster = [...ldata];
+    divisionMaster = [...diviData];
     dbStats = { ..._stats };
 
     dataLoaded = true;
@@ -116,24 +128,37 @@
     }
   };
   const uploadDivisionMaster = async () => {
-    if (selectedFile) {
-      const { error, errorMsg, path } = await api.uploadDivisionMaster({
-        fileName: selectedFile,
-      });
-      if (error) {
-        console.log(
-          "failed to uploaded result file: ",
-          selectedFile,
-          "error is : ",
-          errorMsg
-        );
+    try {
+      if (selectedFile) {
+        const { error, errorMsg, path } = await api.uploadDivisionMaster({
+          fileName: selectedFile,
+        });
+        if (error) {
+          console.log(
+            "failed to uploaded result file: ",
+            selectedFile,
+            "error is : ",
+            errorMsg
+          );
+          selectedFile = null;
+          return;
+        }
+        console.log("uploding file :", selectedFile);
         selectedFile = null;
-        return;
+      } else {
+        console.error("no file selected");
       }
-      console.log("uploding file :", selectedFile);
-      selectedFile = null;
-    } else {
-      console.error("no file selected");
+    } catch (error) {
+      console.log("exception in processing handleUpload");
+    } finally {
+      const {
+        error,
+        errorMsg,
+        data: diviData,
+      } = await api.getDivisionMasterCSVFilesData();
+      if (error) return;
+      divisionMaster = [...diviData];
+      console.log("divisionData is: ", divisionMaster);
     }
   };
 
@@ -161,6 +186,7 @@
       resultData = [...data];
     }
   };
+
   const handleSubjectMasterDelete = async (fileName) => {
     console.log("handlesubjectMAster delete called", fileName);
     try {
@@ -186,9 +212,34 @@
       subjectMaster = [...ldata];
     }
   };
+  const handleDivisionMasterDelete = async (fileName) => {
+    console.log("handle divison Master delete called", fileName);
+    try {
+      console.log("handle divsionMaster delete called");
+      // const filename = 'your-file-name';
+      // const response = await deleteFile(filename);
+      const response = await api.deleteDivisionMasterCSVFiles({ fileName });
+
+      if (response.success) {
+        console.log("File deleted successfully");
+      } else {
+        console.error("Failed to delete file:", response.error);
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    } finally {
+      const {
+        error,
+        errorMsg,
+        data: diviData,
+      } = await api.getDivisionMasterCSVFilesData();
+      if (error) return; // handle error
+      divisionMaster = [...diviData];
+    }
+  };
 </script>
 
-{JSON.stringify(subjectMaster)}
+{JSON.stringify(divisionMaster)}
 <!-- <button on:click={fetchData}>getdata</button> -->
 <div class="flex bg-gray-200 m-2 rounded-lg">
   <div
@@ -693,79 +744,82 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
-          >
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          {#each divisionMaster as divData}
+            <tr
+              class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
             >
-              HSCData.CSV
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              100
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-            </th>
-            <td class="px-6 py-4">Pending</td>
-
-            <td class="px-6 py-4">
-              <button
-                class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
-                >Insert To DB</button
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-            </td>
-            <td class="px-6 py-4">
-              <button
-                class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                {divData.fileName}
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="w-6 h-6"
+                {divData.TOTAL}
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              </th>
+              <td class="px-6 py-4">Pending</td>
+
+              <td class="px-6 py-4">
+                <button
+                  class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                  >Insert To DB</button
                 >
-                  <path
-                    fill-rule="evenodd"
-                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-            </td></tr
-          >
+              </td>
+              <td class="px-6 py-4">
+                <button
+                  on:click={handleDivisionMasterDelete(divData.fileName)}
+                  class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </td></tr
+            >
+          {/each}
         </tbody>
       </table>
     </div>
@@ -869,4 +923,3 @@
     </table>
   </div>
 </div> -->
--->

@@ -143,7 +143,29 @@ const getSubjectMasterCSVFilesData = async () => {
   } catch (e) {
     return {
       error: -1,
-      errorMsg: "exception in processing result csv files : ",
+      errorMsg: "exception in processing subject csv files : ",
+      e,
+    };
+  }
+};
+
+const getDivisionMasterCSVFilesData = async () => {
+  try {
+    const { error, errorMsg, files } = await getDivisionMasterCSVFiles();
+    if (error) return { error, errorMsg };
+    console.log("files is: ", files);
+    let promises = files.map(async (file) => {
+      const { error, errorMsg, stats } = await getDivisionMasterData({
+        fileName: file,
+      });
+      return { fileName: file, ...stats };
+    });
+    let data = await Promise.all(promises);
+    return { error: 0, errorMsg: "", data };
+  } catch (e) {
+    return {
+      error: -1,
+      errorMsg: "exception in processing result division csv files : ",
       e,
     };
   }
@@ -229,6 +251,34 @@ const getSubjectMasterCSVFiles = async () => {
     return { error: -1, errorMsg: e };
   }
 };
+const getDivisionMasterCSVFiles = async () => {
+  let url = new URL(`${apiServer}/csv/divisionMaster`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { files } = responseResult;
+    console.log("files :", files);
+    return { error: 0, errorMsg: "", files };
+  } catch (e) {
+    console.log("api.getDivisionMasterCSVFiles:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
+
 const getSubjectMasterData = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/subjectMaster/stats/${fileName}`);
   console.log("url: ", url);
@@ -252,6 +302,33 @@ const getSubjectMasterData = async ({ fileName }) => {
     return { error: 0, errorMsg: "", filename, stats };
   } catch (e) {
     console.log("api.getSubjectMasterData:", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
+const getDivisionMasterData = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/csv/divisionMaster/stats/${fileName}`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { filename, stats } = responseResult;
+    console.log("filesname :", filename);
+    return { error: 0, errorMsg: "", filename, stats };
+  } catch (e) {
+    console.log("api.getdivisionMasterData:", e);
     return { error: -1, errorMsg: e };
   }
 };
@@ -301,6 +378,29 @@ const deleteSubjectMasterCSVFiles = async ({ fileName }) => {
     return { success: false, error: error.message };
   }
 };
+
+const deleteDivisionMasterCSVFiles = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/csv/divisionMaster/${fileName}`);
+  console.log("url: ", url);
+
+  try {
+    let response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete file");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error divsion master file:", error);
+    return { success: false, error: error.message };
+  }
+};
 // api.js
 
 // export async function deleteFile(filename) {
@@ -325,10 +425,17 @@ export let api = {
   uploadResult,
   uploadSubjectMaster,
   uploadDivisionMaster,
+
   getResultCSVFilesData,
   deleteCSVFiles,
+
   getSubjectMasterCSVFiles,
   getSubjectMasterData,
   getSubjectMasterCSVFilesData,
   deleteSubjectMasterCSVFiles,
+
+  getDivisionMasterCSVFiles,
+  getDivisionMasterData,
+  getDivisionMasterCSVFilesData,
+  deleteDivisionMasterCSVFiles
 };
