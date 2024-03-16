@@ -26,6 +26,32 @@ const uploadResult = async ({ fileName }) => {
     return { error: -1, errorMsg: e };
   }
 };
+const insertIntoDb = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/db/result/insert/${fileName}`);
+  console.log("url: ", url);
+  console.log("fileName: ", fileName);
+
+  const formData = new FormData();
+  formData.append("file", fileName);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      body: formData,
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, path } = responseResult;
+    return { error, errorMsg, path };
+  } catch (e) {
+    console.log("api.uploadResult failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
 
 const uploadSubjectMaster = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/subjectMaster/upload`);
@@ -53,6 +79,7 @@ const uploadSubjectMaster = async ({ fileName }) => {
     return { error: -1, errorMsg: e };
   }
 };
+
 const uploadDivisionMaster = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/divisionMaster/upload`);
   console.log("url: ", url);
