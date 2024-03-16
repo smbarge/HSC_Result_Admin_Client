@@ -4,11 +4,17 @@
   import { onMount } from "svelte";
   import { Spinner } from "flowbite-svelte";
   import { flip } from "svelte/animate";
+  import { Alert } from "flowbite-svelte";
 
   let resultData = [];
   let subjectMaster = [];
   let divisionMaster = [];
 
+  let insertMessage;
+  let subjectMasterMessage;
+
+  let subjMessage=false;
+  let iMessage = false;
   let dbStats = {};
   let dataLoaded = false;
   onMount(async () => {
@@ -91,6 +97,58 @@
       if (error) return;
       resultData = [...data];
       console.log("resultData is: ", resultData);
+    }
+  };
+  const handleInsert = async (fileName) => {
+    console.log("filename is", fileName);
+
+    try {
+      const { error, errorMsg, filename, message } = await api.insertIntoDb({
+        fileName,
+      });
+      console.log("path is ", filename, message);
+      insertMessage = message;
+      iMessage = true;
+      setTimeout(() => {
+        iMessage = false;
+      }, 3000);
+      if (error) {
+        console.log(
+          "failed to insert csv file in db : ",
+          fileName,
+          "error is : ",
+          errorMsg
+        );
+        return;
+      }
+    } catch (e) {
+      console.log("exception in processing handleUpload");
+    }
+  };
+  const handleInsertSubjectMaster = async (fileName) => {
+    console.log("filename is", fileName);
+
+    try {
+      const { error, errorMsg, filename, message } = await api.insertSubjectMasterIntoDb({
+        fileName,
+      });
+      console.log("path is ", filename, message);
+      subjectMasterMessage = message;
+      subjMessage = true;
+      setTimeout(() => {
+        subjMessage = false;
+      }, 3000);
+      if (error) {
+        console.log(
+          "failed to insert csv file in db : ",
+          fileName,
+          "error is : ",
+          errorMsg
+        );
+        return;
+      }
+    } catch (e) {
+      console.log("exception in processing handleUpload");
     }
   };
   const uploadSubjectMaster = async () => {
@@ -526,6 +584,7 @@
 
                 <td class="px-6 py-4">
                   <button
+                    on:click={handleInsert(data.fileName)}
                     class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                     >Insert To DB</button
                   >
@@ -555,6 +614,14 @@
             {/each}
           </tbody>
         </table>
+        {#if iMessage}
+          <div>
+            <Alert color="green">
+              <span class="font-medium">Success alert!</span>
+              {insertMessage}
+            </Alert>
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -661,6 +728,7 @@
               <td class="px-6 py-4">Pending</td>
               <td class="px-6 py-4">
                 <button
+                  on:click={handleInsertSubjectMaster(subdata.fileName)}
                   class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >Insert To DB</button
                 >
@@ -689,6 +757,14 @@
           {/each}
         </tbody>
       </table>
+      {#if subjMessage}
+      <div>
+        <Alert color="green">
+          <span class="font-medium">Success alert!</span>
+          {subjectMasterMessage}
+        </Alert>
+      </div>
+    {/if}
     </div>
   </div>
   <div class=" bg-gray-200 p-8 rounded-md">
@@ -795,6 +871,7 @@
 
               <td class="px-6 py-4">
                 <button
+                on:click={handleInsertSubjectMaster(divData.fileName)}
                   class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >Insert To DB</button
                 >
