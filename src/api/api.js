@@ -82,6 +82,34 @@ const insertSubjectMasterIntoDb = async ({ fileName }) => {
     return { error: -1, errorMsg: e };
   }
 };
+
+const insertDivisionMasterIntoDb = async ({ fileName }) => {
+  let url = new URL(`${apiServer}/db/divisionMaster/insert/${fileName}`);
+  console.log("url: ", url);
+  console.log("fileName: ", fileName);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, filename,message } = responseResult;
+    console.log("mesage is--",message)
+    return { error, errorMsg, filename,message };
+  } catch (e) {
+    console.log("api.insert into db failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
 // Define the endpoint URL
 
 
@@ -502,5 +530,6 @@ export let api = {
   getDivisionMasterCSVFilesData,
   deleteDivisionMasterCSVFiles,
   insertIntoDb,
-  insertSubjectMasterIntoDb
+  insertSubjectMasterIntoDb,
+  insertDivisionMasterIntoDb,
 };

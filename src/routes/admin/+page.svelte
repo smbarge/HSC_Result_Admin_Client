@@ -12,9 +12,12 @@
 
   let insertMessage;
   let subjectMasterMessage;
+  let divisionMasterMessage;
 
   let subjMessage=false;
   let iMessage = false;
+  let divisionMessage=false
+
   let dbStats = {};
   let dataLoaded = false;
   onMount(async () => {
@@ -151,6 +154,35 @@
       console.log("exception in processing handleUpload");
     }
   };
+
+    const handleInsertDivisionMaster = async (fileName) => {
+    console.log("filename is", fileName);
+
+    try {
+      const { error, errorMsg, filename, message } = await api.insertDivisionMasterIntoDb({
+        fileName,
+      });
+      console.log("path is ", filename, message);
+      divisionMasterMessage = message;
+      divisionMessage = true;
+      setTimeout(() => {
+        divisionMessage = false;
+      }, 3000);
+      if (error) {
+        console.log(
+          "failed to insert csv file in db : ",
+          fileName,
+          "error is : ",
+          errorMsg
+        );
+        return;
+      }
+    } catch (e) {
+      console.log("exception in processing handleUpload");
+    }
+  };
+
+
   const uploadSubjectMaster = async () => {
     try {
       if (selectedFile) {
@@ -615,9 +647,10 @@
           </tbody>
         </table>
         {#if iMessage}
-          <div>
+          <div class="mt-2">
             <Alert color="green">
-              <span class="font-medium">Success alert!</span>
+              <span class="font-medium">
+              </span>
               {insertMessage}
             </Alert>
           </div>
@@ -758,10 +791,14 @@
         </tbody>
       </table>
       {#if subjMessage}
-      <div>
+      <div class="mt-2">
         <Alert color="green">
-          <span class="font-medium">Success alert!</span>
+          <span class="font-medium"> </span>
           {subjectMasterMessage}
+          <div>
+            
+          </div>
+          
         </Alert>
       </div>
     {/if}
@@ -871,7 +908,7 @@
 
               <td class="px-6 py-4">
                 <button
-                on:click={handleInsertSubjectMaster(divData.fileName)}
+                on:click={handleInsertDivisionMaster(divData.fileName)}
                   class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >Insert To DB</button
                 >
@@ -899,6 +936,14 @@
           {/each}
         </tbody>
       </table>
+      {#if divisionMessage}
+      <div class="mt-2">
+        <Alert color="green">
+          <span class="font-medium"></span>
+          {divisionMasterMessage}
+        </Alert>
+      </div>
+    {/if}
     </div>
   </div>
 </div>
