@@ -19,16 +19,19 @@ const suite = create((data = {}, fieldName) => {
   test("mobileNo", "only digits", () => {
     enforce(data.mobileNo).isNumeric();
   });
+  test("enterOtp", "mobile verification code is required", () => {
+    enforce(data.enterOtp).isNotBlank();
+  });
   test("mobileNoVerificationCode", "mobile verification code is required", () => {
     enforce(data.mobileNoVerificationCode).isNotBlank();
   });
   
   test(
-    "mobileNoVerificationCode",
+    "enterOtp",
     "mobile verification code should be 6 digit code",
     () => {
-      enforce(data.mobileNoVerificationCode).lengthEquals(6);
-      enforce(data.mobileNoVerificationCode.trim()).matches(/^[0-9]*$/);
+      enforce(data.enterOtp).lengthEquals(6);
+      enforce(data.enterOtp.trim()).matches(/^[0-9]*$/);
     }
   );
 

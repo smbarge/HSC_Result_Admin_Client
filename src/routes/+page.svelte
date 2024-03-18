@@ -1,8 +1,53 @@
 <script>
   import { FloatingLabelInput, Helper } from "flowbite-svelte";
   import { goto } from "$app/navigation";
+  import mobileValidation from "../validation/mobileVerification";
   let sendotp = false;
+  let enterOtp = false;
+
+  let user = {
+    mobileNo: "",
+    enterOtp: "",
+  };
+
+  let userErrors = {
+    mobileNo: "",
+    enterOtp: "",
+  };
+  let alertMsg = "";
+  let res = mobileValidation(user);
+  const handleChange = (name) => {
+    console.log("handleChange called for :", name);
+    res = mobileValidation(user, name);
+
+    const keys = Object.keys(userErrors);
+
+    keys.forEach((key) => {
+      userErrors[key] = "";
+    });
+
+    res.errors.forEach((e) => {
+      userErrors[e.fieldName] = e.message;
+    });
+  };
+  const viewResults = async () => {
+    alertMsg = "";
+    if (res.hasErrors()) {
+      alertMsg = "Kindly attend to errors above";
+      res.errors.forEach((e) => {
+        userErrors[e.fieldName] = e.message;
+      });
+      userErrors = userError;
+      return;
+    }
+    if (error) {
+      alertMsg = errorMsg;
+      return;
+    }
+    goto("/admin")
+  };
 </script>
+
 
 <div class="bg-gray-50 dark:bg-gray-900">
   <div
@@ -22,22 +67,33 @@
             id="exampleWrapper"
             class="grid gap-6 items-end w-full md:grid-cols-1"
           >
-            <FloatingLabelInput
-              style="outlined"
-              id="floating_outlined"
-              name="floating_outlined"
-              type="text"
-            >
-              Mobile Number
-            </FloatingLabelInput>
+            <div class="relative pb-4">
+              <FloatingLabelInput
+                style="outlined"
+                id="floating_outlined"
+                name="floating_outlined"
+                type="text"
+                bind:value={user.mobileNo}
+                on:input={() => {
+                  handleChange("mobileNo");
+                }}
+              >
+                mobileNo Number
+              </FloatingLabelInput>
+              {#if userErrors.mobileNo}
+                <Helper color="red" class="absolute">
+                  {userErrors.mobileNo}
+                </Helper>
+              {/if}
+            </div>
           </div>
 
           <div>
             <button
-            on:click={()=>{
-              sendotp=true;
-            }}
-            class="px-2 py-2 mt-2 rounded-lg text-white bg-primary-400"
+              on:click={() => {
+                sendotp = true;
+              }}
+              class="px-2 py-2 mt-2 rounded-lg text-white bg-primary-400"
               >Send OTP</button
             >
           </div>
@@ -47,26 +103,58 @@
             id="exampleWrapper"
             class="grid gap-6 items-end w-full md:grid-cols-1"
           >
+          <div class="relative pb-4">
             <FloatingLabelInput
               style="outlined"
               id="floating_outlined1"
               name="floating_outlined"
               type="text"
+              bind:value={user.enterOtp}
+              on:input={() => {
+                handleChange("enterOtp");
+              }}
             >
               Enter OTP
             </FloatingLabelInput>
+            {#if userErrors.enterOtp}
+              <Helper color="red" class="absolute">
+                {userErrors.enterOtp}
+              </Helper>
+            {/if}
+          </div>
           </div>
         {/if}
-
-        <div class="flex justify-center items-center">
-          <button
-            on:click={() => {
-              goto("/admin");
-            }}
-            class="bg-primary-400 p-2 flex justify-center items-center text-white rounded-md px-8"
-            >Sign in</button
+        
+          <div class="flex justify-center items-center">
+            <button
+              on:click={viewResults}
+              class="bg-primary-400 p-2 flex justify-center items-center text-white rounded-md px-8"
+              >Sign in</button
+            >
+          </div>
+          {#if alertMsg}
+          <div
+            class="flex mt-2 items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+            role="alert"
           >
-        </div>
+            <svg
+              class="flex-shrink-0 inline w-4 h-4 me-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+              />
+            </svg>
+            <span class="sr-only">Info</span>
+            <div>
+              {alertMsg}
+            </div>
+          </div>
+        {/if}
+      
       </div>
     </div>
   </div>

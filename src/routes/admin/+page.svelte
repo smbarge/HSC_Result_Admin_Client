@@ -327,13 +327,15 @@
       divisionMaster = [...diviData];
     }
   };
+    const customSize = 'w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8';
+
 </script>
 
-{JSON.stringify(divisionMaster)}
+<!-- {JSON.stringify(divisionMaster)} -->
 <!-- <button on:click={fetchData}>getdata</button> -->
-<div class="flex bg-gray-200 m-2 rounded-lg">
+<div class="flex bg-primary-200 m-2 p-2 rounded-lg">
   <div
-    class="text-3xl mt-4 border-b-2 font-semibold flex justify-center item-center"
+    class="text-3xl  font-semibold flex justify-center text-gray-700 p-2 item-center"
   >
     HSC Result Admin Panel
   </div>
@@ -341,7 +343,7 @@
 
 <div class="flex justify-end p-2 mx-10 rounded-lg">
   <div class="flex">
-    <Toggle size="large">Publish</Toggle>
+    <Toggle size="custom" {customSize}>Publish</Toggle>
   </div>
 </div>
 {#if dataLoaded}
