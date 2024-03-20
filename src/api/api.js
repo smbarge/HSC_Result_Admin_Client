@@ -4,7 +4,6 @@ const uploadResult = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/result/upload`);
   console.log("url: ", url);
   console.log("fileName: ", fileName);
-
   const formData = new FormData();
   formData.append("file", fileName);
 
@@ -51,6 +50,60 @@ const insertIntoDb = async ({ fileName }) => {
     return { error, errorMsg, filename,message };
   } catch (e) {
     console.log("api.insert into db failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
+const dbClear = async ({  }) => {
+  let url = new URL(`${apiServer}/db/clear`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, result } = responseResult;
+    console.log("Result is-------",result)
+    return { error, errorMsg, result };
+  } catch (e) {
+    console.log("api.clear db  failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+
+const publishResult = async ({ }) => {
+  let url = new URL(`${apiServer}/db/publish`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, publish } = responseResult;
+    console.log("publish is-------",publish)
+    return { error, errorMsg, publish };
+  } catch (e) {
+    console.log("api.publish failed with error :", e);
     return { error: -1, errorMsg: e };
   }
 };
@@ -532,4 +585,7 @@ export let api = {
   insertIntoDb,
   insertSubjectMasterIntoDb,
   insertDivisionMasterIntoDb,
+
+  dbClear,
+  publishResult,
 };
