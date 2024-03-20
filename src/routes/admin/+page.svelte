@@ -5,7 +5,12 @@
   import { Spinner } from "flowbite-svelte";
   import { flip } from "svelte/animate";
   import { Alert } from "flowbite-svelte";
+  import ShowModel from "../../component/ShowModel.svelte";
+  import { Button, Modal } from "flowbite-svelte";
+  import { ExclamationCircleOutline } from "flowbite-svelte-icons";
+  let popupModal = false;
 
+  let clicked = false;
   let resultData = [];
   let subjectMaster = [];
   let divisionMaster = [];
@@ -14,9 +19,9 @@
   let subjectMasterMessage;
   let divisionMasterMessage;
 
-  let subjMessage=false;
+  let subjMessage = false;
   let iMessage = false;
-  let divisionMessage=false
+  let divisionMessage = false;
 
   let dbStats = {};
   let dataLoaded = false;
@@ -132,9 +137,10 @@
     console.log("filename is", fileName);
 
     try {
-      const { error, errorMsg, filename, message } = await api.insertSubjectMasterIntoDb({
-        fileName,
-      });
+      const { error, errorMsg, filename, message } =
+        await api.insertSubjectMasterIntoDb({
+          fileName,
+        });
       console.log("path is ", filename, message);
       subjectMasterMessage = message;
       subjMessage = true;
@@ -155,13 +161,14 @@
     }
   };
 
-    const handleInsertDivisionMaster = async (fileName) => {
+  const handleInsertDivisionMaster = async (fileName) => {
     console.log("filename is", fileName);
 
     try {
-      const { error, errorMsg, filename, message } = await api.insertDivisionMasterIntoDb({
-        fileName,
-      });
+      const { error, errorMsg, filename, message } =
+        await api.insertDivisionMasterIntoDb({
+          fileName,
+        });
       console.log("path is ", filename, message);
       divisionMasterMessage = message;
       divisionMessage = true;
@@ -181,7 +188,6 @@
       console.log("exception in processing handleUpload");
     }
   };
-
 
   const uploadSubjectMaster = async () => {
     try {
@@ -327,15 +333,15 @@
       divisionMaster = [...diviData];
     }
   };
-    const customSize = 'w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8';
-
+  const customSize =
+    "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";
 </script>
 
 <!-- {JSON.stringify(divisionMaster)} -->
 <!-- <button on:click={fetchData}>getdata</button> -->
 <div class="flex bg-primary-200 m-2 p-2 rounded-lg">
   <div
-    class="text-3xl  font-semibold flex justify-center text-gray-700 p-2 item-center"
+    class="text-3xl font-semibold flex justify-center text-gray-700 p-2 item-center"
   >
     HSC Result Admin Panel
   </div>
@@ -343,9 +349,23 @@
 
 <div class="flex justify-end p-2 mx-10 rounded-lg">
   <div class="flex">
-    <Toggle size="custom" {customSize}>Publish</Toggle>
+    <!-- <Toggle size="custom" {customSize}>Publish</Toggle> -->
+    <Button on:click={() => (popupModal = true)} color="primary">Publish</Button>
   </div>
 </div>
+
+<Modal bind:open={popupModal} size="xs" autoclose>
+  <div class="text-center">
+    <ExclamationCircleOutline
+      class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
+    />
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+      Are you sure you want to Publish this ?
+    </h3>
+    <Button color="primary" class="me-2">Yes, I'm sure</Button>
+    <Button color="alternative">No, cancel</Button>
+  </div>
+</Modal>
 {#if dataLoaded}
   <div class="bg-gray-200 p-2 rounded-md m-8">
     <div class="bg-gray-100 grid grid-cols-1">
@@ -651,8 +671,7 @@
         {#if iMessage}
           <div class="mt-2">
             <Alert color="green">
-              <span class="font-medium">
-              </span>
+              <span class="font-medium"> </span>
               {insertMessage}
             </Alert>
           </div>
@@ -793,17 +812,14 @@
         </tbody>
       </table>
       {#if subjMessage}
-      <div class="mt-2">
-        <Alert color="green">
-          <span class="font-medium"> </span>
-          {subjectMasterMessage}
-          <div>
-            
-          </div>
-          
-        </Alert>
-      </div>
-    {/if}
+        <div class="mt-2">
+          <Alert color="green">
+            <span class="font-medium"> </span>
+            {subjectMasterMessage}
+            <div></div>
+          </Alert>
+        </div>
+      {/if}
     </div>
   </div>
   <div class=" bg-gray-200 p-8 rounded-md">
@@ -910,7 +926,7 @@
 
               <td class="px-6 py-4">
                 <button
-                on:click={handleInsertDivisionMaster(divData.fileName)}
+                  on:click={handleInsertDivisionMaster(divData.fileName)}
                   class="bg-primary-400 hover:bg-primary-600 p-2 rounded-lg text-white"
                   >Insert To DB</button
                 >
@@ -939,16 +955,17 @@
         </tbody>
       </table>
       {#if divisionMessage}
-      <div class="mt-2">
-        <Alert color="green">
-          <span class="font-medium"></span>
-          {divisionMasterMessage}
-        </Alert>
-      </div>
-    {/if}
+        <div class="mt-2">
+          <Alert color="green">
+            <span class="font-medium"></span>
+            {divisionMasterMessage}
+          </Alert>
+        </div>
+      {/if}
     </div>
   </div>
 </div>
+
 <!-- <div>
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4 m-4">
     <div

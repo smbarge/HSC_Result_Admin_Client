@@ -44,10 +44,31 @@
       alertMsg = errorMsg;
       return;
     }
-    goto("/admin")
+    goto("/admin");
+  };
+
+  let phoneNumber = "";
+  let verificationCode = "";
+  let verificationStatus = "";
+
+  const sendCode = async () => {
+    try {
+      const response = await fetch("/send-code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+      const data = await response.json();
+      console.log(data.message);
+      // Handle success or error messages from the backend
+    } catch (error) {
+      console.error("Error sending verification code:", error);
+      // Handle error
+    }
   };
 </script>
-
 
 <div class="bg-gray-50 dark:bg-gray-900">
   <div
@@ -78,7 +99,7 @@
                   handleChange("mobileNo");
                 }}
               >
-                mobileNo Number
+                Mobile Number
               </FloatingLabelInput>
               {#if userErrors.mobileNo}
                 <Helper color="red" class="absolute">
@@ -87,7 +108,6 @@
               {/if}
             </div>
           </div>
-
           <div>
             <button
               on:click={() => {
@@ -103,36 +123,36 @@
             id="exampleWrapper"
             class="grid gap-6 items-end w-full md:grid-cols-1"
           >
-          <div class="relative pb-4">
-            <FloatingLabelInput
-              style="outlined"
-              id="floating_outlined1"
-              name="floating_outlined"
-              type="text"
-              bind:value={user.enterOtp}
-              on:input={() => {
-                handleChange("enterOtp");
-              }}
-            >
-              Enter OTP
-            </FloatingLabelInput>
-            {#if userErrors.enterOtp}
-              <Helper color="red" class="absolute">
-                {userErrors.enterOtp}
-              </Helper>
-            {/if}
-          </div>
+            <div class="relative pb-4">
+              <FloatingLabelInput
+                style="outlined"
+                id="floating_outlined1"
+                name="floating_outlined"
+                type="text"
+                bind:value={user.enterOtp}
+                on:input={() => {
+                  handleChange("enterOtp");
+                }}
+              >
+                Enter OTP
+              </FloatingLabelInput>
+              {#if userErrors.enterOtp}
+                <Helper color="red" class="absolute">
+                  {userErrors.enterOtp}
+                </Helper>
+              {/if}
+            </div>
           </div>
         {/if}
-        
-          <div class="flex justify-center items-center">
-            <button
-              on:click={viewResults}
-              class="bg-primary-400 p-2 flex justify-center items-center text-white rounded-md px-8"
-              >Sign in</button
-            >
-          </div>
-          {#if alertMsg}
+
+        <div class="flex justify-center items-center">
+          <button
+            on:click={viewResults}
+            class="bg-primary-400 p-2 flex justify-center items-center text-white rounded-md px-8"
+            >Sign in</button
+          >
+        </div>
+        {#if alertMsg}
           <div
             class="flex mt-2 items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
             role="alert"
@@ -154,7 +174,6 @@
             </div>
           </div>
         {/if}
-      
       </div>
     </div>
   </div>

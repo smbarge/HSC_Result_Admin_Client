@@ -34,8 +34,6 @@ const suite = create((data = {}, fieldName) => {
       enforce(data.enterOtp.trim()).matches(/^[0-9]*$/);
     }
   );
-
- 
 });
 
 export default suite;
