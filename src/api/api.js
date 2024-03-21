@@ -45,16 +45,16 @@ const insertIntoDb = async ({ fileName }) => {
       throw Error(responseResult.errorMsg);
     }
     const responseResult = await reply.json();
-    const { error, errorMsg, filename,message } = responseResult;
-    console.log("mesage is--",message)
-    return { error, errorMsg, filename,message };
+    const { error, errorMsg, filename, message } = responseResult;
+    console.log("mesage is--", message);
+    return { error, errorMsg, filename, message };
   } catch (e) {
     console.log("api.insert into db failed with error :", e);
     return { error: -1, errorMsg: e };
   }
 };
 
-const dbClear = async ({  }) => {
+const dbClear = async ({}) => {
   let url = new URL(`${apiServer}/db/clear`);
   console.log("url: ", url);
 
@@ -73,7 +73,7 @@ const dbClear = async ({  }) => {
     }
     const responseResult = await reply.json();
     const { error, errorMsg, result } = responseResult;
-    console.log("Result is-------",result)
+    console.log("Result is-------", result);
     return { error, errorMsg, result };
   } catch (e) {
     console.log("api.clear db  failed with error :", e);
@@ -81,7 +81,7 @@ const dbClear = async ({  }) => {
   }
 };
 
-const publishResult = async ({ }) => {
+const publishResult = async ({}) => {
   let url = new URL(`${apiServer}/db/publish`);
   console.log("url: ", url);
 
@@ -100,7 +100,33 @@ const publishResult = async ({ }) => {
     }
     const responseResult = await reply.json();
     const { error, errorMsg, publish } = responseResult;
-    console.log("publish is-------",publish)
+    console.log("publish is-------", publish);
+    return { error, errorMsg, publish };
+  } catch (e) {
+    console.log("api.publish failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+const unPublishResult = async () => {
+  let url = new URL(`${apiServer}/db/unpublish`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, publish } = responseResult;
+    console.log("publish is-------", publish);
     return { error, errorMsg, publish };
   } catch (e) {
     console.log("api.publish failed with error :", e);
@@ -127,9 +153,9 @@ const insertSubjectMasterIntoDb = async ({ fileName }) => {
       throw Error(responseResult.errorMsg);
     }
     const responseResult = await reply.json();
-    const { error, errorMsg, filename,message } = responseResult;
-    console.log("mesage is--",message)
-    return { error, errorMsg, filename,message };
+    const { error, errorMsg, filename, message } = responseResult;
+    console.log("mesage is--", message);
+    return { error, errorMsg, filename, message };
   } catch (e) {
     console.log("api.insert into db failed with error :", e);
     return { error: -1, errorMsg: e };
@@ -155,9 +181,9 @@ const insertDivisionMasterIntoDb = async ({ fileName }) => {
       throw Error(responseResult.errorMsg);
     }
     const responseResult = await reply.json();
-    const { error, errorMsg, filename,message } = responseResult;
-    console.log("mesage is--",message)
-    return { error, errorMsg, filename,message };
+    const { error, errorMsg, filename, message } = responseResult;
+    console.log("mesage is--", message);
+    return { error, errorMsg, filename, message };
   } catch (e) {
     console.log("api.insert into db failed with error :", e);
     return { error: -1, errorMsg: e };
@@ -165,10 +191,7 @@ const insertDivisionMasterIntoDb = async ({ fileName }) => {
 };
 // Define the endpoint URL
 
-
 // Make the API call
-
-
 
 const uploadSubjectMaster = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/subjectMaster/upload`);
@@ -255,11 +278,16 @@ const getResultCSVFilesData = async () => {
     const { error, errorMsg, files } = await getResultCSVFiles();
     if (error) return { error, errorMsg };
     console.log("files is: ", files);
+
     let promises = files.map(async (file) => {
       const { error, errorMsg, stats } = await getCSVFilesData({
-        fileName: file,
+        fileName: file.fileName,
       });
-      return { fileName: file, ...stats };
+      return {
+        fileName: file.fileName,
+        md5checksum: file.md5checksum,
+        ...stats,
+      };
     });
     let data = await Promise.all(promises);
     return { error: 0, errorMsg: "", data };
@@ -276,11 +304,25 @@ const getSubjectMasterCSVFilesData = async () => {
     const { error, errorMsg, files } = await getSubjectMasterCSVFiles();
     if (error) return { error, errorMsg };
     console.log("files is: ", files);
+    // let promises = files.map(async (file) => {
+    //   const { error, errorMsg, stats } = await getSubjectMasterData({
+    //     fileName: file,
+    //   });
+    //   return { fileName: file, ...stats };
+    // });
+    // let data = await Promise.all(promises);
+
+    // return { error: 0, errorMsg: "", data };
+
     let promises = files.map(async (file) => {
       const { error, errorMsg, stats } = await getSubjectMasterData({
-        fileName: file,
+        fileName: file.fileName,
       });
-      return { fileName: file, ...stats };
+      return {
+        fileName: file.fileName,
+        md5checksum: file.md5checksum,
+        ...stats,
+      };
     });
     let data = await Promise.all(promises);
     return { error: 0, errorMsg: "", data };
@@ -298,11 +340,23 @@ const getDivisionMasterCSVFilesData = async () => {
     const { error, errorMsg, files } = await getDivisionMasterCSVFiles();
     if (error) return { error, errorMsg };
     console.log("files is: ", files);
+    // let promises = files.map(async (file) => {
+    //   const { error, errorMsg, stats } = await getDivisionMasterData({
+    //     fileName: file,
+    //   });
+    //   return { fileName: file, ...stats };
+    // });
+    // let data = await Promise.all(promises);
+    // return { error: 0, errorMsg: "", data };
     let promises = files.map(async (file) => {
       const { error, errorMsg, stats } = await getDivisionMasterData({
-        fileName: file,
+        fileName: file.fileName,
       });
-      return { fileName: file, ...stats };
+      return {
+        fileName: file.fileName,
+        md5checksum: file.md5checksum,
+        ...stats,
+      };
     });
     let data = await Promise.all(promises);
     return { error: 0, errorMsg: "", data };
@@ -421,7 +475,6 @@ const getDivisionMasterCSVFiles = async () => {
     return { error: -1, errorMsg: e };
   }
 };
-
 
 const getSubjectMasterData = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/subjectMaster/stats/${fileName}`);
@@ -564,7 +617,7 @@ const deleteDivisionMasterCSVFiles = async ({ fileName }) => {
 //   }
 // }
 
-const getPublish = async ({ }) => {
+const getPublish = async () => {
   let url = new URL(`${apiServer}/db/publish`);
   console.log("url: ", url);
 
@@ -582,10 +635,35 @@ const getPublish = async ({ }) => {
     }
     const responseResult = await reply.json();
     const { error, errorMsg, publish } = responseResult;
-    console.log("publish is-------",publish)
+    console.log("publish is-------", publish);
     return { error, errorMsg, publish };
   } catch (e) {
     console.log("api.publish failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
+const getInsertedCSVs = async () => {
+  let url = new URL(`${apiServer}/db/insertedCSVs`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, files } = responseResult;
+    console.log("inserted csvs are: ", files);
+    return { error, errorMsg, files };
+  } catch (e) {
+    console.log("api.getInsertedCSVs failed with error :", e);
     return { error: -1, errorMsg: e };
   }
 };
@@ -613,5 +691,7 @@ export let api = {
 
   dbClear,
   publishResult,
-  getPublish
+  unPublishResult,
+  getPublish,
+  getInsertedCSVs,
 };
