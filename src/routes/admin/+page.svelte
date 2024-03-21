@@ -9,6 +9,7 @@
   import { Button, Modal } from "flowbite-svelte";
   import { ExclamationCircleOutline } from "flowbite-svelte-icons";
   let popupModal = false;
+  let popupModal2 = false;
 
   // let clicked = false;
   let resultData = [];
@@ -25,7 +26,7 @@
 
   let dbStats = {};
   let dataLoaded = false;
-  onMount(async () => {
+  const onInit = async () => {
     dataLoaded = false;
     const { error, errorMsg, stats: _stats } = await api.getDbStats();
     const {
@@ -58,6 +59,9 @@
 
     dataLoaded = true;
     console.log("dbStats : ", dbStats);
+  };
+  onMount(async () => {
+    await onInit();
   });
   let divisionCodes = [
     { name: "Pune", div: 1 },
@@ -120,6 +124,8 @@
       setTimeout(() => {
         iMessage = false;
       }, 3000);
+
+      await onInit();
       if (error) {
         console.log(
           "failed to insert csv file in db : ",
@@ -134,15 +140,18 @@
     }
   };
   const clearDb = async () => {
-    console.log("clear db");
+    console.log("clear db called");
     try {
+      console.log("clear db called in try catch");
       const { error, errorMsg, result } = await api.dbClear({});
+      console.log("clear db called end");
       console.log("result is ", result);
       // insertMessage = message;
       // iMessage = true;
       // setTimeout(() => {
       //   iMessage = false;
       // }, 3000);
+      await onInit();
       if (error) {
         console.log(
           "failed to clear db  in db : ",
@@ -187,11 +196,7 @@
 
   const getPublish = async () => {
     try {
-      const {
-        error,
-        errorMsg,
-        publish: lpublish,
-      } = await api.getPublish({});
+      const { error, errorMsg, publish: lpublish } = await api.getPublish({});
       console.log("result is ", lpublish);
       // insertMessage = message;
       publish = lpublish;
@@ -417,7 +422,7 @@
     "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";
 </script>
 
-publish is{JSON.stringify(publish)}
+<!-- publish is{JSON.stringify(publish)} -->
 <!-- {JSON.stringify(divisionMaster)} -->
 <!-- <button on:click={fetchData}>getdata</button> -->
 <div class="flex bg-primary-200 m-2 p-2 rounded-lg">
@@ -434,17 +439,30 @@ publish is{JSON.stringify(publish)}
 
     <Button
       on:click={() => {
-        getPublish(),
-         (popupModal = true);
+        getPublish(), (popupModal = true);
       }}
       color="primary">Publish</Button
     >
-
+    <Button on:click={() => (popupModal2 = true)}
+      >Clear DB
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        class="w-5 h-5"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </Button>
     <!-- <button on:click={publish} class="bg-primary-700 p-2 px-8 rounded-lg text-white"
     >Publish
     </button
   > -->
-    <button
+    <!-- <button
       on:click={clearDb}
       class=" flex bg-primary-700 p-2 px-8 rounded-lg text-white"
     >
@@ -463,10 +481,25 @@ publish is{JSON.stringify(publish)}
           />
         </svg>
       </span>
-    </button>
+    </button> -->
   </div>
 </div>
 
+<!-- delete model -->
+<Modal bind:open={popupModal2} size="xs" autoclose>
+  <div class="text-center">
+    <ExclamationCircleOutline
+      class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
+    />
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+      Are you sure you want to Clear this DB?
+    </h3>
+    <Button on:click={clearDb} color="red" class="me-2">Yes, I'm sure</Button>
+    <Button color="alternative">No, cancel</Button>
+  </div>
+</Modal>
+
+<!-- publish model -->
 <Modal bind:open={popupModal} size="xs" autoclose>
   <div class="text-center">
     <ExclamationCircleOutline
@@ -476,12 +509,12 @@ publish is{JSON.stringify(publish)}
       Are you sure you want to Publish this ?
     </h3>
     {#if publish == "false"}
-      <Button color="primary" class="me-2" on:click={()=> onPublish()}
+      <Button color="primary" class="me-2" on:click={() => onPublish()}
         >Yes, I'm sure</Button
       >
     {:else}
       <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-      It Is  Already Published
+        It Is Already Published
       </h3>
     {/if}
     <Button color="alternative">No, cancel</Button>
