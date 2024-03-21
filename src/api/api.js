@@ -564,6 +564,31 @@ const deleteDivisionMasterCSVFiles = async ({ fileName }) => {
 //   }
 // }
 
+const getPublish = async ({ }) => {
+  let url = new URL(`${apiServer}/db/publish`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+    const responseResult = await reply.json();
+    const { error, errorMsg, publish } = responseResult;
+    console.log("publish is-------",publish)
+    return { error, errorMsg, publish };
+  } catch (e) {
+    console.log("api.publish failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
 export let api = {
   getDbStats,
   uploadResult,
@@ -588,4 +613,5 @@ export let api = {
 
   dbClear,
   publishResult,
+  getPublish
 };

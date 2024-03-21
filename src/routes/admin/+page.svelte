@@ -18,7 +18,7 @@
   let insertMessage;
   let subjectMasterMessage;
   let divisionMasterMessage;
-
+  let publish = "";
   let subjMessage = false;
   let iMessage = false;
   let divisionMessage = false;
@@ -107,7 +107,6 @@
       console.log("resultData is: ", resultData);
     }
   };
-
   const handleInsert = async (fileName) => {
     console.log("filename is", fileName);
 
@@ -158,12 +157,16 @@
     }
   };
 
-  const publish = async () => {
-    console.log("publish");
+  const onPublish = async () => {
     try {
-      const { error, errorMsg, publish } = await api.publishResult({});
-      console.log("result is ", publish);
+      const {
+        error,
+        errorMsg,
+        publish: lpublish,
+      } = await api.publishResult({});
+      console.log("result is ", lpublish);
       // insertMessage = message;
+      publish = lpublish;
       // iMessage = true;
       // setTimeout(() => {
       //   iMessage = false;
@@ -181,7 +184,34 @@
       console.log("exception in processing publish");
     }
   };
-  
+
+  const getPublish = async () => {
+    try {
+      const {
+        error,
+        errorMsg,
+        publish: lpublish,
+      } = await api.getPublish({});
+      console.log("result is ", lpublish);
+      // insertMessage = message;
+      publish = lpublish;
+      // iMessage = true;
+      // setTimeout(() => {
+      //   iMessage = false;
+      // }, 3000);
+      if (error) {
+        console.log(
+          "failed to publish  : ",
+
+          "error is : ",
+          errorMsg
+        );
+        return;
+      }
+    } catch (e) {
+      console.log("exception in processing publish");
+    }
+  };
 
   const handleInsertSubjectMaster = async (fileName) => {
     console.log("filename is", fileName);
@@ -387,6 +417,7 @@
     "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";
 </script>
 
+publish is{JSON.stringify(publish)}
 <!-- {JSON.stringify(divisionMaster)} -->
 <!-- <button on:click={fetchData}>getdata</button> -->
 <div class="flex bg-primary-200 m-2 p-2 rounded-lg">
@@ -400,20 +431,39 @@
 <div class="flex justify-end p-2 mx-10 rounded-lg">
   <div class="flex gap-2">
     <!-- <Toggle size="custom" {customSize}>Publish</Toggle> -->
-     <Button on:click={() => (popupModal = true)} color="primary">Publish</Button
+
+    <Button
+      on:click={() => {
+        getPublish(),
+         (popupModal = true);
+      }}
+      color="primary">Publish</Button
     >
+
     <!-- <button on:click={publish} class="bg-primary-700 p-2 px-8 rounded-lg text-white"
     >Publish
     </button
   > -->
-    <div on:click={clearDb} class=" flex  bg-primary-700 p-2 px-8 rounded-lg text-white"
-      > CLEAR
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-      </svg>
-      
-      </div
+    <button
+      on:click={clearDb}
+      class=" flex bg-primary-700 p-2 px-8 rounded-lg text-white"
     >
+      Clear DB
+      <span class="ml-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -425,9 +475,15 @@
     <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
       Are you sure you want to Publish this ?
     </h3>
-    <Button
-    on:click={publish}
-    color="primary" class="me-2">Yes, I'm sure</Button>
+    {#if publish == "false"}
+      <Button color="primary" class="me-2" on:click={()=> onPublish()}
+        >Yes, I'm sure</Button
+      >
+    {:else}
+      <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+      It Is  Already Published
+      </h3>
+    {/if}
     <Button color="alternative">No, cancel</Button>
   </div>
 </Modal>
