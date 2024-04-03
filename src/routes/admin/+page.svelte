@@ -3,7 +3,7 @@
   import { api } from "../../api/api";
   import { onMount } from "svelte";
   import { Spinner } from "flowbite-svelte";
-  import { flip } from "svelte/animate";
+  // import { flip } from "svelte/animate";
   import { Alert } from "flowbite-svelte";
   import ShowModel from "../../component/ShowModel.svelte";
   import { Button, Modal } from "flowbite-svelte";
@@ -16,6 +16,7 @@
   let resultData = [];
   let subjectMaster = [];
   let divisionMaster = [];
+  // );
 
   let insertMessage = "";
   let subjectMasterMessage = "";

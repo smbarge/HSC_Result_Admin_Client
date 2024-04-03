@@ -1,5 +1,5 @@
 let apiServer = import.meta.env.VITE_APISERVER;
-
+import { goto } from "$app/navigation";
 const uploadResult = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/result/upload`);
   console.log("url: ", url);
@@ -297,6 +297,51 @@ const getResultCSVFilesData = async () => {
       errorMsg: "exception in processing result csv files : ",
       e,
     };
+  }
+};
+const login = async ({ username, password, token }) => {
+  let url = new URL(`${apiServer}/auth/login`);
+  console.log("url: ", url.href);
+  // console.log("token is --: ", token);
+  console.log("data is---", username, password);
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+
+    if (!reply.ok) {
+      console.log("reply is not ok:");
+      throw new Error("Failed to login");
+    }
+    const data = await reply.json();
+    if (data.token) {
+      // Store token in localStorage or sessionStorage
+      // console.log("token is ", data.token);
+      localStorage.setItem("token", data.token);
+      // console.log("token is ", data.token);
+      goto("/admin");
+      // Redirect to dashboard or next page on successful login
+      return {
+        // token: data.token,
+        status:302,
+        headers: {
+          location: "/admin",
+        },
+      };
+    } else {
+      throw new Error("Token not received");
+    }
+  } catch (e) {
+    console.log("api.login  failed with error :", e);
+    return { error: -1, errorMsg: e };
   }
 };
 const getSubjectMasterCSVFilesData = async () => {
@@ -694,4 +739,6 @@ export let api = {
   unPublishResult,
   getPublish,
   getInsertedCSVs,
+
+  login,
 };
