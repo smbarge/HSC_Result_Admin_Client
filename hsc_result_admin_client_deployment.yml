@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hsc-result-admin-client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hsc-result-admin-client
+  template:
+    metadata:
+      labels:
+        app: hsc-result-admin-client
+    spec:
+      containers:
+        - name: hsc-result-admin-client
+          image: smbarge/hsc_result_admin_client
+          ports:
+            - containerPort: 5173
+
