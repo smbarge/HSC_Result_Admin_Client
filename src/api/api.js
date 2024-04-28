@@ -1,4 +1,5 @@
 let apiServer = import.meta.env.VITE_APISERVER;
+console.log("apiServer is:", apiServer)
 import { goto } from "$app/navigation";
 const uploadResult = async ({ fileName }) => {
   let url = new URL(`${apiServer}/csv/result/upload`);

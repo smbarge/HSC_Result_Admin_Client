@@ -3,12 +3,11 @@ kind: Service
 metadata:
   name: hsc-result-admin-client-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: hsc-result-admin-client
   ports:
     - protocol: TCP
-      port: 5173
+      port: 80
       targetPort: 5173
-      nodePort: 32001  # Choose a port in the range 30000-32767
 
