@@ -17,7 +17,7 @@
   let subjectMaster = [];
   let divisionMaster = [];
   // );
-
+  // let onUpload = false;
   let insertMessage = "";
   let subjectMasterMessage = "";
   let divisionMasterMessage = "";
@@ -62,9 +62,10 @@
       })
       .map((e) => e.filename);
   };
+
   const onInit = async () => {
     dataLoaded = false;
-
+    // onUpload = false;
     const { error, errorMsg, stats: _stats } = await api.getDbStats();
     const {
       error: lerror,
@@ -95,6 +96,7 @@
       errorMsg: errorMsg5,
       files,
     } = await api.getInsertedCSVs();
+
     setInsertedCSVs(files);
 
     // const divisionRep = await api.getDivisionMasterCSVFiles();
@@ -109,6 +111,7 @@
     dbStats = { ..._stats };
 
     dataLoaded = true;
+    // onUpload = true;
     console.log("dbStats : ", dbStats);
   };
   onMount(async () => {
@@ -125,16 +128,13 @@
     { name: "Latur", div: 8 },
     { name: "Kokan", div: 9 },
   ];
-  let selectedFile = "";
-  let selectedFiles = [];
-  const handleFileChange = (e) => {
-    selectedFile = e.target.files[0];
-    console.log("selected file :", selectedFile);
-  };
 
+  let selectedFile;
+  let fileUploading = false;
   const handleUpload = async () => {
     try {
       if (selectedFile) {
+        fileUploading = true;
         const { error, errorMsg, path } = await api.uploadResult({
           fileName: selectedFile,
         });
@@ -148,8 +148,9 @@
           selectedFile = null;
           return;
         }
+
         console.log("uploding file :", selectedFile);
-        selectedFile = null;
+        selectedFile = undefined;
       } else {
         console.error("no file selected");
       }
@@ -159,8 +160,14 @@
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
       if (error) return;
       resultData = [...data];
+
+      fileUploading = false;
       console.log("resultData is: ", resultData);
     }
+  };
+
+  const refreshStats = async () => {
+    await onInit();
   };
   const handleInsert = async (fileName) => {
     console.log("filename is", fileName);
@@ -176,7 +183,7 @@
         iMessage = false;
       }, 3000);
 
-      await onInit();
+      // await onInit();
       if (error) {
         console.log(
           "failed to insert csv file in db : ",
@@ -499,6 +506,10 @@
       divisionMaster = [...diviData];
     }
   };
+  const onFileChange = (e) => {
+    selectedFile = e.target.files[0];
+    console.log("selected file: ", selectedFile);
+  };
   const customSize =
     "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";
 </script>
@@ -507,13 +518,30 @@
   <!-- publish is{JSON.stringify(publish)} -->
   <!-- {JSON.stringify(divisionMaster)} -->
   <!-- <button on:click={fetchData}>getdata</button> -->
-  <div class="flex bg-primary-200 m-2 p-2 rounded-lg">
+  <div class="flex bg-primary-200 m-2 p-2 rounded-lg justify-between">
     <div
       class="text-3xl font-semibold flex justify-center text-gray-700 p-2 item-center"
     >
       HSC Result Admin Panel : {publish == "true"
         ? "The result is published"
         : "The result is not published"}
+    </div>
+    <div class="mt-2">
+      <Button on:click={() => (popupModal2 = true)}
+        >Clear DB
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </Button>
     </div>
   </div>
 
@@ -539,17 +567,21 @@
           >UnPublish
         </Button>
       {/if}
-      <Button on:click={() => (popupModal2 = true)}
-        >Clear DB
+
+      <Button
+        on:click={() => {
+          refreshStats();
+        }}
+        >Refresh Stats
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          class="w-5 h-5"
+          class="w-4 ml-4 h-4"
         >
           <path
             fill-rule="evenodd"
-            d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+            d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z"
             clip-rule="evenodd"
           />
         </svg>
@@ -801,7 +833,14 @@
         </div>
 
         <Label class="pb-2" for="small_size">Upload CSV Result</Label>
-        <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
+        <!-- <Fileupload id="small_size" size="sm" bind:value={selectedFile} on:change={()=> fileUploading = false}/> -->
+
+        <input
+          class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          id="file_input"
+          type="file"
+          on:change={onFileChange}
+        />
 
         <div class="ml-2 text-blue-700 flex gap-2 mt-2">
           <!-- HSC_Result_Data -->
@@ -820,11 +859,18 @@
           </svg>
         </span> -->
         </div>
-        <button
-          on:click={handleUpload}
-          class="p-2 px-6 font-bold bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
-          >Upload</button
-        >
+        {#if fileUploading == false}
+          <button
+            on:click={handleUpload}
+            class="p-2 px-6 font-bold bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
+            >Upload</button
+          >
+        {:else}
+          <!-- Uploading.... -->
+          <div class="">
+        <span class="font-semibold"> Uploading...</span> <Spinner size={8} />
+          </div>
+        {/if}
 
         <div class="mt-4">
           <table
@@ -955,7 +1001,19 @@
           Upload Subject Master CSV
         </div>
         <Label class="pb-2" for="small_size">Upload Subject Master</Label>
-        <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
+        <!-- <Fileupload
+          id="small_size"
+          size="sm"
+          bind:value={selectedFile}
+          on:change={() => (fileUploading = false)}
+        /> -->
+        <input
+          class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          id="file_input"
+          type="file"
+          on:change={onFileChange}
+        />
+
         <div class="ml-2 text-blue-700 flex gap-2 mt-2">
           <!-- HSC_Result_Data
         <span class="">
@@ -1104,7 +1162,18 @@
           Upload Division Master CSV
         </div>
         <Label class="pb-2" for="small_size">Upload Division Master</Label>
-        <Fileupload id="small_size" size="sm" on:change={handleFileChange} />
+        <!-- <Fileupload
+          id="small_size"
+          size="sm"
+          bind:value={selectedFile}
+          on:change={() => (fileUploading = false)}
+        /> -->
+        <input
+          class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          id="file_input"
+          type="file"
+          on:change={onFileChange}
+        />
 
         <div class="ml-2 text-blue-700 flex gap-2 mt-2">
           <!-- HSC_Result_Data -->
@@ -1250,6 +1319,6 @@
 {:else}
   <!-- loading .... -->
   <div class="text-center">
-    <Spinner size={12} />
+    <Spinner size={16} />
   </div>
 {/if}
