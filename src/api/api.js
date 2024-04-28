@@ -6,6 +6,7 @@ const uploadResult = async ({ fileName }) => {
   console.log("fileName: ", fileName);
   const formData = new FormData();
   formData.append("file", fileName);
+  formData.append("index", "0");
 
   try {
     let reply = await fetch(url.toString(), {
@@ -290,6 +291,7 @@ const getResultCSVFilesData = async () => {
       };
     });
     let data = await Promise.all(promises);
+    console.log('data is ',data)
     return { error: 0, errorMsg: "", data };
   } catch (e) {
     return {
@@ -433,7 +435,7 @@ const getResultCSVFiles = async () => {
 
     const responseResult = await reply.json();
     const { files } = responseResult;
-    console.log("files :", files);
+    console.log("files is--:", files);
     return { error: 0, errorMsg: "", files };
   } catch (e) {
     console.log("api.getResultCSVFiles:", e);
