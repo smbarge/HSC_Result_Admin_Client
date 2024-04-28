@@ -128,16 +128,16 @@
     { name: "Latur", div: 8 },
     { name: "Kokan", div: 9 },
   ];
-  let selectedFile 
+
+  let selectedFile;
   let fileUploading = false;
   const handleUpload = async () => {
     try {
-      fileUploading = true;
       if (selectedFile) {
+        fileUploading = true;
         const { error, errorMsg, path } = await api.uploadResult({
           fileName: selectedFile,
         });
-        fileUploading = false;
         if (error) {
           console.log(
             "failed to uploaded result file: ",
@@ -160,6 +160,8 @@
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
       if (error) return;
       resultData = [...data];
+
+      fileUploading = false;
       console.log("resultData is: ", resultData);
     }
   };
@@ -505,9 +507,9 @@
     }
   };
   const onFileChange = (e) => {
-    selectedFile = e.target.files[0]
-    console.log("selected file: ", selectedFile)
-  }
+    selectedFile = e.target.files[0];
+    console.log("selected file: ", selectedFile);
+  };
   const customSize =
     "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";
 </script>
@@ -857,12 +859,18 @@
           </svg>
         </span> -->
         </div>
+        {#if fileUploading == false}
           <button
             on:click={handleUpload}
             class="p-2 px-6 font-bold bg-primary-400 hover:bg-primary-600 rounded-md mt-2 text-white"
             >Upload</button
           >
-      
+        {:else}
+          <!-- Uploading.... -->
+          <div class="">
+        <span class="font-semibold"> Uploading...</span> <Spinner size={8} />
+          </div>
+        {/if}
 
         <div class="mt-4">
           <table
@@ -999,7 +1007,7 @@
           bind:value={selectedFile}
           on:change={() => (fileUploading = false)}
         /> -->
-          <input
+        <input
           class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           id="file_input"
           type="file"
@@ -1160,13 +1168,12 @@
           bind:value={selectedFile}
           on:change={() => (fileUploading = false)}
         /> -->
-          <input
+        <input
           class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           id="file_input"
           type="file"
           on:change={onFileChange}
         />
-
 
         <div class="ml-2 text-blue-700 flex gap-2 mt-2">
           <!-- HSC_Result_Data -->
