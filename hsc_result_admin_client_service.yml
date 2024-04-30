@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: hsc-result-admin-client-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: hsc-result-admin-client
   ports:

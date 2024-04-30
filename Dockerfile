@@ -5,6 +5,7 @@ COPY package-lock.json .
 RUN npm install
 COPY . ./
 ENV PORT 5173
+ENV VITE_APISERVER=http://hsc_result_admin_client_service:5173
 #ENV VITE_APISERVER=http://3.110.75.194:3001
 EXPOSE $PORT
 RUN npm run build

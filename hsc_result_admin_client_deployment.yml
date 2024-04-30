@@ -19,5 +19,5 @@ spec:
             - containerPort: 5173
           env:
             - name: VITE_APISERVER
-              value: http://a77e2a201eb024d609de4b4780541e4a-947427809.ap-south-1.elb.amazonaws.com
+              value: http://hsc-result-admin-client-service:5173
 
