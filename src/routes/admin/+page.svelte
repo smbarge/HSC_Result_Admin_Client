@@ -131,6 +131,7 @@
 
   let selectedFile;
   let fileUploading = false;
+
   const handleUpload = async () => {
     try {
       if (selectedFile) {
@@ -165,6 +166,16 @@
       console.log("resultData is: ", resultData);
     }
   };
+
+  const handleShouldPublish= async()=>{
+    try {
+      let {error,errorMsg,result}=await api.getShouldPublish({})
+      console.log("error is",error)
+      console.log("errorMsg  is",errorMsg)
+    } catch (error) {
+      console.log("error is ",error)
+    }
+  }
 
   const refreshStats = async () => {
     await onInit();
@@ -224,9 +235,20 @@
       console.log("exception in processing clear db");
     }
   };
-
+let alertMessage="";
   const onPublish = async () => {
     try {
+      { 
+        let {error,errorMsg,result}=await api.getShouldPublish({})
+        if(error== -1){
+         alertMessage=errorMsg
+          return 
+        }
+      console.log("error is",error)
+      console.log("errorMsg  is",errorMsg)
+    }
+    
+
       const {
         error,
         errorMsg,
@@ -433,10 +455,11 @@
 
   let responseData = null;
   let error = null;
-
+   let removing =false
   const handleDelete = async (fileName) => {
     console.log("handle delete called", fileName);
     try {
+      removing =true
       console.log("handle delete called");
       // const filename = 'your-file-name';
       // const response = await deleteFile(filename);
@@ -453,6 +476,7 @@
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
       if (error) return; // handle error
       resultData = [...data];
+      removing = false
     }
   };
 
@@ -515,6 +539,7 @@
 </script>
 
 {#if dataLoaded}
+{JSON.stringify(alertMessage)}
   <!-- publish is{JSON.stringify(publish)} -->
   <!-- {JSON.stringify(divisionMaster)} -->
   <!-- <button on:click={fetchData}>getdata</button> -->
@@ -586,6 +611,11 @@
           />
         </svg>
       </Button>
+      {#if alertMessage}
+      <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+        <span class="font-medium">alert!</span> {alertMessage}
+      </div>
+      {/if}
       <!-- <button on:click={publish} class="bg-primary-700 p-2 px-8 rounded-lg text-white"
     >Publish
     </button
@@ -834,7 +864,6 @@
 
         <Label class="pb-2" for="small_size">Upload CSV Result</Label>
         <!-- <Fileupload id="small_size" size="sm" bind:value={selectedFile} on:change={()=> fileUploading = false}/> -->
-
         <input
           class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           id="file_input"
@@ -960,6 +989,7 @@
                     >
                   </td>
                   <td class="px-6 py-4">
+                    
                     <button
                       on:click={() => {
                         handleDelete(data.fileName);

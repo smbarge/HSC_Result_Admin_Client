@@ -715,6 +715,31 @@ const getInsertedCSVs = async () => {
     return { error: -1, errorMsg: e };
   }
 };
+const getShouldPublish = async ({}) => {
+  let url = new URL(`${apiServer}/db/shouldPublish`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (reply.status != 200) {
+      const responseResult = await reply.json();
+      throw Error(responseResult.errorMsg);
+    }
+
+    const responseResult = await reply.json();
+    const { error, errorMsg, result } = responseResult;
+    return { error, errorMsg, result };
+  } catch (e) {
+    console.log("api.getDbStats failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
 export let api = {
   getDbStats,
   uploadResult,
@@ -744,4 +769,5 @@ export let api = {
   getInsertedCSVs,
 
   login,
+  getShouldPublish,
 };
