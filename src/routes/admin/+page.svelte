@@ -31,6 +31,7 @@
   let insertedResultCSVFiles = [];
   let insertedSubjectMasterCSVFiles = [];
   let insertedDivisionMasterCSVFiles = [];
+  
   const setInsertedCSVs = (files) => {
     //   "files": [
     //   {
@@ -111,7 +112,6 @@
     dbStats = { ..._stats };
 
     dataLoaded = true;
-    // onUpload = true;
     console.log("dbStats : ", dbStats);
   };
   onMount(async () => {
@@ -358,6 +358,13 @@
         );
         return;
       }
+    let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -1149,7 +1156,6 @@
                   class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                 >
                 </th>
-
                 <td class="px-6 py-4">
                   {insertedSubjectMasterCSVFiles.find(
                     (e) => e == subdata.fileName
