@@ -393,6 +393,15 @@
         );
         return;
       }
+        let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
+    
+      
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
