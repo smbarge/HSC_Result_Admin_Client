@@ -1362,7 +1362,7 @@
 {:else}
   <!-- loading .... -->
   <div class="  flex justify-center p-6 mt-96">
-    <Spinner size={16} />
-    <div class=" flex item-center">Loading...Wait</div>
+    <Spinner size={20} />
+    <div class="ml-2 flex item-center justify-center mt-6 text-xl">Loading Data Please Wait .....</div>
   </div>
 {/if}
