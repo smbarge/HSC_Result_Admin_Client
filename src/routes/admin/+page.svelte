@@ -167,15 +167,15 @@
     }
   };
 
-  const handleShouldPublish = async () => {
-    try {
-      let { error, errorMsg, result } = await api.getShouldPublish({});
-      console.log("error is", error);
-      console.log("errorMsg  is", errorMsg);
-    } catch (error) {
-      console.log("error is ", error);
-    }
-  };
+  // const handleShouldPublish = async () => {
+  //   try {
+  //     let { error, errorMsg, result } = await api.getShouldPublish({});
+  //     console.log("error is", error);
+  //     console.log("errorMsg  is", errorMsg);
+  //   } catch (error) {
+  //     console.log("error is ", error);
+  //   }
+  // };
 
   const refreshStats = async () => {
     await onInit();
@@ -205,6 +205,14 @@
 
         return;
       }
+       let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
+    
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
