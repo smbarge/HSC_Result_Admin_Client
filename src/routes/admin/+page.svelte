@@ -31,6 +31,7 @@
   let insertedResultCSVFiles = [];
   let insertedSubjectMasterCSVFiles = [];
   let insertedDivisionMasterCSVFiles = [];
+  
   const setInsertedCSVs = (files) => {
     //   "files": [
     //   {
@@ -111,7 +112,6 @@
     dbStats = { ..._stats };
 
     dataLoaded = true;
-    // onUpload = true;
     console.log("dbStats : ", dbStats);
   };
   onMount(async () => {
@@ -131,6 +131,7 @@
 
   let selectedFile;
   let fileUploading = false;
+
   const handleUpload = async () => {
     try {
       if (selectedFile) {
@@ -166,6 +167,16 @@
     }
   };
 
+  // const handleShouldPublish = async () => {
+  //   try {
+  //     let { error, errorMsg, result } = await api.getShouldPublish({});
+  //     console.log("error is", error);
+  //     console.log("errorMsg  is", errorMsg);
+  //   } catch (error) {
+  //     console.log("error is ", error);
+  //   }
+  // };
+
   const refreshStats = async () => {
     await onInit();
   };
@@ -194,6 +205,14 @@
 
         return;
       }
+       let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
+    
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -224,9 +243,22 @@
       console.log("exception in processing clear db");
     }
   };
-
+  let alertMessage = "";
   const onPublish = async () => {
     try {
+      {
+        let { error, errorMsg, result } = await api.getShouldPublish({});
+        if (error == -1) {
+          alertMessage = errorMsg;
+          return;
+        }
+        setTimeout(() => {
+          alertMessage = "";
+        }, 3000);
+        console.log("error is", error);
+        console.log("errorMsg  is", errorMsg);
+      }
+
       const {
         error,
         errorMsg,
@@ -252,6 +284,11 @@
       console.log("exception in processing publish");
     }
   };
+  $: if (alertMessage) {
+    setTimeout(() => {
+      alertMessage = "";
+    }, 4000);
+  }
   const onUnPublish = async () => {
     try {
       const {
@@ -329,6 +366,13 @@
         );
         return;
       }
+    let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -357,6 +401,15 @@
         );
         return;
       }
+        let {
+      error: error5,
+      errorMsg: errorMsg5,
+      files,
+    } = await api.getInsertedCSVs();
+
+    setInsertedCSVs(files);
+    
+      
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -433,10 +486,11 @@
 
   let responseData = null;
   let error = null;
-
+  let removing = false;
   const handleDelete = async (fileName) => {
     console.log("handle delete called", fileName);
     try {
+      removing = true;
       console.log("handle delete called");
       // const filename = 'your-file-name';
       // const response = await deleteFile(filename);
@@ -453,6 +507,7 @@
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
       if (error) return; // handle error
       resultData = [...data];
+      removing = false;
     }
   };
 
@@ -515,6 +570,7 @@
 </script>
 
 {#if dataLoaded}
+  <!-- {JSON.stringify(alertMessage)} -->
   <!-- publish is{JSON.stringify(publish)} -->
   <!-- {JSON.stringify(divisionMaster)} -->
   <!-- <button on:click={fetchData}>getdata</button> -->
@@ -586,6 +642,7 @@
           />
         </svg>
       </Button>
+
       <!-- <button on:click={publish} class="bg-primary-700 p-2 px-8 rounded-lg text-white"
     >Publish
     </button
@@ -611,6 +668,17 @@
       </span>
     </button> -->
     </div>
+  </div>
+  <div class="m-8">
+    {#if alertMessage}
+      <div
+        class="p-4 mb-4 text-xl text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+        role="alert"
+      >
+        <span class="font-bold text-3xl">Alert!</span>
+        {alertMessage}
+      </div>
+    {/if}
   </div>
 
   <!-- delete model -->
@@ -690,7 +758,6 @@
             class="col-span-5 md:col-span-1 bg-gray-200 p-2 rounded-md text-sm"
           >
             Pass
-
             <div class="flex">
               <!-- <Fa icon={faRupeeSign} class="text-xs md:text-lg leading-lg  opacity-75" /> -->
               <span class="ml-2 font-bold">{dbStats.PAS}</span>
@@ -834,7 +901,6 @@
 
         <Label class="pb-2" for="small_size">Upload CSV Result</Label>
         <!-- <Fileupload id="small_size" size="sm" bind:value={selectedFile} on:change={()=> fileUploading = false}/> -->
-
         <input
           class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           id="file_input"
@@ -868,10 +934,19 @@
         {:else}
           <!-- Uploading.... -->
           <div class="">
-        <span class="font-semibold"> Uploading...</span> <Spinner size={8} />
+            <span class="font-semibold"> Uploading...</span>
+            <Spinner size={8} />
           </div>
         {/if}
-
+        {#if iMessage}
+          <div class="mt-2">
+            <Alert color="green">
+              <span class="font-medium text-2xl">
+                {insertMessage}
+              </span>
+            </Alert>
+          </div>
+        {/if}
         <div class="mt-4">
           <table
             class="w-full rounded-lg text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
@@ -984,14 +1059,6 @@
               {/each}
             </tbody>
           </table>
-          {#if iMessage}
-            <div class="mt-2">
-              <Alert color="green">
-                <span class="font-medium"> </span>
-                {insertMessage}
-              </Alert>
-            </div>
-          {/if}
         </div>
       </div>
     </div>
@@ -1106,7 +1173,6 @@
                   class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                 >
                 </th>
-
                 <td class="px-6 py-4">
                   {insertedSubjectMasterCSVFiles.find(
                     (e) => e == subdata.fileName
@@ -1318,7 +1384,8 @@
   </div>
 {:else}
   <!-- loading .... -->
-  <div class="text-center">
-    <Spinner size={16} />
+  <div class="  flex justify-center p-6 mt-96">
+    <Spinner size={20} />
+    <div class="ml-2 flex item-center justify-center mt-6 text-xl">Loading Data Please Wait .....</div>
   </div>
 {/if}
