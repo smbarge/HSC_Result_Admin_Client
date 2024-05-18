@@ -31,7 +31,7 @@
   let insertedResultCSVFiles = [];
   let insertedSubjectMasterCSVFiles = [];
   let insertedDivisionMasterCSVFiles = [];
-  
+
   const setInsertedCSVs = (files) => {
     //   "files": [
     //   {
@@ -205,14 +205,13 @@
 
         return;
       }
-       let {
-      error: error5,
-      errorMsg: errorMsg5,
-      files,
-    } = await api.getInsertedCSVs();
+      let {
+        error: error5,
+        errorMsg: errorMsg5,
+        files,
+      } = await api.getInsertedCSVs();
 
-    setInsertedCSVs(files);
-    
+      setInsertedCSVs(files);
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -243,6 +242,17 @@
       console.log("exception in processing clear db");
     }
   };
+  const saveData = async () => {
+    let result="data"
+    console.log("saveData  called..........");
+    try {
+      const { error, errorMsg, result } = await api.saveData({result:result1});
+      console.log("data is ", result);
+    } catch (e) {
+      console.log("exception in processing ");
+    }
+  };
+
   let alertMessage = "";
   const onPublish = async () => {
     try {
@@ -366,13 +376,13 @@
         );
         return;
       }
-    let {
-      error: error5,
-      errorMsg: errorMsg5,
-      files,
-    } = await api.getInsertedCSVs();
+      let {
+        error: error5,
+        errorMsg: errorMsg5,
+        files,
+      } = await api.getInsertedCSVs();
 
-    setInsertedCSVs(files);
+      setInsertedCSVs(files);
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -401,15 +411,12 @@
         );
         return;
       }
-        let {
-      error: error5,
-      errorMsg: errorMsg5,
-      files,
-    } = await api.getInsertedCSVs();
-
-    setInsertedCSVs(files);
-    
-      
+      let {
+        error: error5,
+        errorMsg: errorMsg5,
+        files,
+      } = await api.getInsertedCSVs();
+      setInsertedCSVs(files);
     } catch (e) {
       console.log("exception in processing handleUpload");
     }
@@ -642,6 +649,11 @@
           />
         </svg>
       </Button>
+      <Button
+        on:click={() => {
+          saveData();
+        }}>Save</Button
+      >
 
       <!-- <button on:click={publish} class="bg-primary-700 p-2 px-8 rounded-lg text-white"
     >Publish
@@ -1386,6 +1398,8 @@
   <!-- loading .... -->
   <div class="  flex justify-center p-6 mt-96">
     <Spinner size={20} />
-    <div class="ml-2 flex item-center justify-center mt-6 text-xl">Loading Data Please Wait .....</div>
+    <div class="ml-2 flex item-center justify-center mt-6 text-xl">
+      Loading Data Please Wait .....
+    </div>
   </div>
 {/if}

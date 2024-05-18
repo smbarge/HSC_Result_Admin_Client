@@ -1,17 +1,17 @@
-let apiServer ;
-import {browser } from "$app/environment"
-console.log("apiServer is:", apiServer)
+let apiServer;
+import { browser } from "$app/environment";
+console.log("apiServer is:", apiServer);
 const getServer = async () => {
-  if(browser && !apiServer) {
-    let resp = await fetch("/getServer")
-    let result = await resp.json()
-    apiServer = result.apiServer
+  if (browser && !apiServer) {
+    let resp = await fetch("/getServer");
+    let result = await resp.json();
+    apiServer = result.apiServer;
   }
-  return apiServer
-}
+  return apiServer;
+};
 import { goto } from "$app/navigation";
 const uploadResult = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/result/upload`);
   console.log("url: ", url);
   console.log("fileName: ", fileName);
@@ -39,7 +39,7 @@ const uploadResult = async ({ fileName }) => {
 };
 
 const insertIntoDb = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/result/insert/${fileName}`);
   console.log("url: ", url);
   console.log("fileName: ", fileName);
@@ -68,7 +68,7 @@ const insertIntoDb = async ({ fileName }) => {
 };
 
 const dbClear = async ({}) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/clear`);
   console.log("url: ", url);
 
@@ -94,9 +94,32 @@ const dbClear = async ({}) => {
     return { error: -1, errorMsg: e };
   }
 };
+const saveData = async ({ result}) => {
+  let apiServer = await getServer();
+  let url = new URL(`${apiServer}/db/save`);
+  console.log("url: ", url);
+
+  try {
+    let reply = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+   
+    const responseResult = await reply.json();
+    const { error, errorMsg, result } = responseResult;
+    console.log("Result is-------", result);
+    return { error, errorMsg, result };
+  } catch (e) {
+    console.log("api.save  failed with error :", e);
+    return { error: -1, errorMsg: e };
+  }
+};
 
 const publishResult = async ({}) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/publish`);
   console.log("url: ", url);
 
@@ -123,7 +146,7 @@ const publishResult = async ({}) => {
   }
 };
 const unPublishResult = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/unpublish`);
   console.log("url: ", url);
 
@@ -151,7 +174,7 @@ const unPublishResult = async () => {
 };
 
 const insertSubjectMasterIntoDb = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/subjectMaster/insert/${fileName}`);
   console.log("url: ", url);
   console.log("fileName: ", fileName);
@@ -180,8 +203,7 @@ const insertSubjectMasterIntoDb = async ({ fileName }) => {
 };
 
 const insertDivisionMasterIntoDb = async ({ fileName }) => {
-
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/divisionMaster/insert/${fileName}`);
   console.log("url: ", url);
   console.log("fileName: ", fileName);
@@ -213,7 +235,7 @@ const insertDivisionMasterIntoDb = async ({ fileName }) => {
 // Make the API call
 
 const uploadSubjectMaster = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/subjectMaster/upload`);
   console.log("url: ", url);
 
@@ -241,7 +263,7 @@ const uploadSubjectMaster = async ({ fileName }) => {
 };
 
 const uploadDivisionMaster = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/divisionMaster/upload`);
   console.log("url: ", url);
 
@@ -269,7 +291,7 @@ const uploadDivisionMaster = async ({ fileName }) => {
 };
 
 const getDbStats = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/stats`);
   console.log("url: ", url);
 
@@ -296,7 +318,7 @@ const getDbStats = async () => {
 };
 
 const getResultCSVFilesData = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   try {
     const { error, errorMsg, files } = await getResultCSVFiles();
     if (error) return { error, errorMsg };
@@ -313,7 +335,7 @@ const getResultCSVFilesData = async () => {
       };
     });
     let data = await Promise.all(promises);
-    console.log('data is ',data)
+    console.log("data is ", data);
     return { error: 0, errorMsg: "", data };
   } catch (e) {
     return {
@@ -324,7 +346,7 @@ const getResultCSVFilesData = async () => {
   }
 };
 const login = async ({ username, password, token }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/auth/login`);
   console.log("url: ", url.href);
   // console.log("token is --: ", token);
@@ -334,7 +356,7 @@ const login = async ({ username, password, token }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         username,
@@ -356,7 +378,7 @@ const login = async ({ username, password, token }) => {
       // Redirect to dashboard or next page on successful login
       return {
         // token: data.token,
-        status:302,
+        status: 302,
         headers: {
           location: "/admin",
         },
@@ -440,7 +462,7 @@ const getDivisionMasterCSVFilesData = async () => {
 };
 
 const getResultCSVFiles = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/result`);
   console.log("url: ", url);
 
@@ -468,7 +490,7 @@ const getResultCSVFiles = async () => {
 };
 
 const getCSVFilesData = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/result/stats/${fileName}`);
   console.log("url: ", url);
 
@@ -496,7 +518,7 @@ const getCSVFilesData = async ({ fileName }) => {
 };
 
 const getSubjectMasterCSVFiles = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/subjectMaster`);
   console.log("url: ", url);
 
@@ -523,7 +545,7 @@ const getSubjectMasterCSVFiles = async () => {
   }
 };
 const getDivisionMasterCSVFiles = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/divisionMaster`);
   console.log("url: ", url);
 
@@ -551,7 +573,7 @@ const getDivisionMasterCSVFiles = async () => {
 };
 
 const getSubjectMasterData = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/subjectMaster/stats/${fileName}`);
   console.log("url: ", url);
 
@@ -579,7 +601,7 @@ const getSubjectMasterData = async ({ fileName }) => {
 };
 
 const getDivisionMasterData = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/divisionMaster/stats/${fileName}`);
   console.log("url: ", url);
 
@@ -607,7 +629,7 @@ const getDivisionMasterData = async ({ fileName }) => {
 };
 
 const deleteCSVFiles = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/result/${fileName}`);
   console.log("url: ", url);
 
@@ -631,7 +653,7 @@ const deleteCSVFiles = async ({ fileName }) => {
 };
 
 const deleteSubjectMasterCSVFiles = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/subjectMaster/${fileName}`);
   console.log("url: ", url);
 
@@ -655,7 +677,7 @@ const deleteSubjectMasterCSVFiles = async ({ fileName }) => {
 };
 
 const deleteDivisionMasterCSVFiles = async ({ fileName }) => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/csv/divisionMaster/${fileName}`);
   console.log("url: ", url);
 
@@ -697,7 +719,7 @@ const deleteDivisionMasterCSVFiles = async ({ fileName }) => {
 // }
 
 const getPublish = async () => {
-  let apiServer = await getServer()
+  let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/publish`);
   console.log("url: ", url);
 
@@ -802,4 +824,5 @@ export let api = {
 
   login,
   getShouldPublish,
+  saveData,
 };
