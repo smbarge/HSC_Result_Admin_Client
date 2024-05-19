@@ -102,9 +102,9 @@
 
     // const divisionRep = await api.getDivisionMasterCSVFiles();
     // console.log("division master file",divisionRep)
-    console.log("subjectMaster data..", ldata);
+    // console.log("subjectMaster data..", ldata);
 
-    console.log("csv files data is: ", data);
+    // console.log("csv files data is: ", data);
     resultData = [...data];
 
     subjectMaster = [...ldata];
@@ -112,7 +112,7 @@
     dbStats = { ..._stats };
 
     dataLoaded = true;
-    console.log("dbStats : ", dbStats);
+    // console.log("dbStats : ", dbStats);
   };
   onMount(async () => {
     await onInit();
@@ -150,7 +150,7 @@
           return;
         }
 
-        console.log("uploding file :", selectedFile);
+        // console.log("uploding file :", selectedFile);
         selectedFile = undefined;
       } else {
         console.error("no file selected");
@@ -163,7 +163,7 @@
       resultData = [...data];
 
       fileUploading = false;
-      console.log("resultData is: ", resultData);
+      // console.log("resultData is: ", resultData);
     }
   };
 
@@ -181,13 +181,13 @@
     await onInit();
   };
   const handleInsert = async (fileName) => {
-    console.log("filename is", fileName);
+    // console.log("filename is", fileName);
 
     try {
       const { error, errorMsg, filename, message } = await api.insertIntoDb({
         fileName,
       });
-      console.log("path is ", filename, message);
+      // console.log("path is ", filename, message);
       insertMessage = message;
       iMessage = true;
       setTimeout(() => {
@@ -217,12 +217,12 @@
     }
   };
   const clearDb = async () => {
-    console.log("clear db called");
+    // console.log("clear db called");
     try {
-      console.log("clear db called in try catch");
+      // console.log("clear db called in try catch");
       const { error, errorMsg, result } = await api.dbClear({});
-      console.log("clear db called end");
-      console.log("result is ", result);
+      // console.log("clear db called end");
+      // console.log("result is ", result);
       // insertMessage = message;
       // iMessage = true;
       // setTimeout(() => {
@@ -244,10 +244,10 @@
   };
   const saveData = async () => {
     let result="data"
-    console.log("saveData  called..........");
+    // console.log("saveData  called..........");
     try {
       const { error, errorMsg, result } = await api.saveData({result:result1});
-      console.log("data is ", result);
+      // console.log("data is ", result);
     } catch (e) {
       console.log("exception in processing ");
     }
@@ -265,8 +265,8 @@
         setTimeout(() => {
           alertMessage = "";
         }, 3000);
-        console.log("error is", error);
-        console.log("errorMsg  is", errorMsg);
+        // console.log("error is", error);
+        // console.log("errorMsg  is", errorMsg);
       }
 
       const {
@@ -274,7 +274,7 @@
         errorMsg,
         publish: lpublish,
       } = await api.publishResult({});
-      console.log("result is ", lpublish);
+      // console.log("result is ", lpublish);
       // insertMessage = message;
       publish = lpublish;
       // iMessage = true;
@@ -306,7 +306,7 @@
         errorMsg,
         publish: lpublish,
       } = await api.unPublishResult({});
-      console.log("result is ", lpublish);
+      // console.log("result is ", lpublish);
       // insertMessage = message;
       publish = lpublish;
       // iMessage = true;
@@ -330,7 +330,7 @@
   const getPublish = async () => {
     try {
       let { error, errorMsg, publish: lpublish } = await api.getPublish({});
-      console.log("result is ", lpublish);
+      // console.log("result is ", lpublish);
       // insertMessage = message;
       if (lpublish == null) lpublish = "false";
 
@@ -354,14 +354,14 @@
   };
 
   const handleInsertSubjectMaster = async (fileName) => {
-    console.log("filename is", fileName);
+    // console.log("filename is", fileName);
 
     try {
       const { error, errorMsg, filename, message } =
         await api.insertSubjectMasterIntoDb({
           fileName,
         });
-      console.log("path is ", filename, message);
+      // console.log("path is ", filename, message);
       subjectMasterMessage = message;
       subjMessage = true;
       setTimeout(() => {
@@ -389,14 +389,14 @@
   };
 
   const handleInsertDivisionMaster = async (fileName) => {
-    console.log("filename is", fileName);
+    // console.log("filename is", fileName);
 
     try {
       const { error, errorMsg, filename, message } =
         await api.insertDivisionMasterIntoDb({
           fileName,
         });
-      console.log("path is ", filename, message);
+      // console.log("path is ", filename, message);
       divisionMasterMessage = message;
       divisionMessage = true;
       setTimeout(() => {
@@ -438,7 +438,7 @@
           selectedFile = null;
           return;
         }
-        console.log("uploding file :", selectedFile);
+        // console.log("uploding file :", selectedFile);
         selectedFile = null;
       } else {
         console.error("no file selected");
@@ -453,7 +453,7 @@
       } = await api.getSubjectMasterCSVFilesData();
       if (error) return;
       subjectMaster = [...ldata];
-      console.log("resultData is: ", subjectMaster);
+      // console.log("resultData is: ", subjectMaster);
     }
   };
   const uploadDivisionMaster = async () => {
@@ -472,13 +472,13 @@
           selectedFile = null;
           return;
         }
-        console.log("uploding file :", selectedFile);
+        // console.log("uploding file :", selectedFile);
         selectedFile = null;
       } else {
         console.error("no file selected");
       }
     } catch (error) {
-      console.log("exception in processing handleUpload");
+      // console.log("exception in processing handleUpload");
     } finally {
       const {
         error,
@@ -487,7 +487,7 @@
       } = await api.getDivisionMasterCSVFilesData();
       if (error) return;
       divisionMaster = [...diviData];
-      console.log("divisionData is: ", divisionMaster);
+      // console.log("divisionData is: ", divisionMaster);
     }
   };
 
@@ -495,10 +495,10 @@
   let error = null;
   let removing = false;
   const handleDelete = async (fileName) => {
-    console.log("handle delete called", fileName);
+    // console.log("handle delete called", fileName);
     try {
       removing = true;
-      console.log("handle delete called");
+      // console.log("handle delete called");
       // const filename = 'your-file-name';
       // const response = await deleteFile(filename);
       const response = await api.deleteCSVFiles({ fileName });
@@ -519,9 +519,9 @@
   };
 
   const handleSubjectMasterDelete = async (fileName) => {
-    console.log("handlesubjectMAster delete called", fileName);
+    // console.log("handlesubjectMAster delete called", fileName);
     try {
-      console.log("handle subjectMaster delete called");
+      // console.log("handle subjectMaster delete called");
       // const filename = 'your-file-name';
       // const response = await deleteFile(filename);
       const response = await api.deleteSubjectMasterCSVFiles({ fileName });
@@ -544,9 +544,9 @@
     }
   };
   const handleDivisionMasterDelete = async (fileName) => {
-    console.log("handle divison Master delete called", fileName);
+    // console.log("handle divison Master delete called", fileName);
     try {
-      console.log("handle divsionMaster delete called");
+      // console.log("handle divsionMaster delete called");
       // const filename = 'your-file-name';
       // const response = await deleteFile(filename);
       const response = await api.deleteDivisionMasterCSVFiles({ fileName });
@@ -570,7 +570,7 @@
   };
   const onFileChange = (e) => {
     selectedFile = e.target.files[0];
-    console.log("selected file: ", selectedFile);
+    // console.log("selected file: ", selectedFile);
   };
   const customSize =
     "w-14 h-10 after:top-1 after:left-[4px]  after:h-8 after:w-8";

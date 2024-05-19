@@ -19,7 +19,7 @@
   let alertMsg = "";
   let res = loginVerification(user);
   const handleChange = (name) => {
-    console.log("handleChange called for :", name);
+    // console.log("handleChange called for :", name);
     res = loginVerification(user, name);
 
     const keys = Object.keys(userErrors);
@@ -33,7 +33,7 @@
     });
   };
   const onSignIn = async () => {
-    console.log("on sign in clicked -------------");
+    // console.log("on sign in clicked -------------");
     alertMsg = "";
 
     if (res.hasErrors()) {
@@ -49,7 +49,7 @@
         username: user.username,
         password: user.password,
       });
-      console.log("token is --", token);
+      // console.log("token is --", token);
     }
 
     // if (error) {
@@ -72,7 +72,7 @@
         body: JSON.stringify({ phoneNumber }),
       });
       const data = await response.json();
-      console.log(data.message);
+      // console.log(data.message);
       // Handle success or error messages from the backend
     } catch (error) {
       console.error("Error sending verification code:", error);
