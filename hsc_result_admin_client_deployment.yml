@@ -19,5 +19,5 @@ spec:
             - containerPort: 5173
           env:
             - name: VITE_APISERVER
-              value: "https://hscadminapi.chanakyasoft.com"
+              value: "https://hscadminapi.mahahsscboard.in"
 
