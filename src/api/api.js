@@ -94,7 +94,7 @@ const dbClear = async ({}) => {
     return { error: -1, errorMsg: e };
   }
 };
-const saveData = async ({ result}) => {
+const saveData = async () => {
   let apiServer = await getServer();
   let url = new URL(`${apiServer}/db/save`);
   // console.log("url: ", url);

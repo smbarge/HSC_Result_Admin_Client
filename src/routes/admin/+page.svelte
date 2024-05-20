@@ -244,10 +244,10 @@
   };
   const saveData = async () => {
     let result="data"
-    // console.log("saveData  called..........");
+    console.log("saveData  called..........");
     try {
-      const { error, errorMsg, result } = await api.saveData({result:result1});
-      // console.log("data is ", result);
+      const { error, errorMsg, result } = await api.saveData();
+      console.log("data is ", result);
     } catch (e) {
       console.log("exception in processing ");
     }
