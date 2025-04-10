@@ -762,7 +762,7 @@ const getInsertedCSVs = async () => {
     }
     const responseResult = await reply.json();
     const { error, errorMsg, files } = responseResult;
-    // console.log("inserted csvs are: ", files);
+    console.log("inserted csvs are: ", files);
     return { error, errorMsg, files };
   } catch (e) {
     console.log("api.getInsertedCSVs failed with error :", e);

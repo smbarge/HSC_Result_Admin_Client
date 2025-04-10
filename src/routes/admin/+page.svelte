@@ -33,35 +33,28 @@
   let insertedDivisionMasterCSVFiles = [];
 
   const setInsertedCSVs = (files) => {
-    //   "files": [
-    //   {
-    //     "key": "csv:divisionMaster:divisions.csv",
-    //     "timestamp": "2024-03-21T11:59:35.507Z",
-    //     "filename": "divisions.csv",
-    //     "recordCount": 9
-    //   }
-    // ]
-
+   
     insertedDivisionMasterCSVFiles = files
       .filter((e) => {
-        const pattern = /^csv:divisionMaster:.+$/;
-        return pattern.test(e.key);
+        const pattern = /^divisions\.csv$/i;
+        return pattern.test(e.filename);
       })
       .map((e) => e.filename);
 
     insertedSubjectMasterCSVFiles = files
       .filter((e) => {
-        const pattern = /^csv:subjectMaster:.+$/;
-        return pattern.test(e.key);
+        const pattern = /^HSCSUBJ\.csv$/i;
+        return pattern.test(e.filename);
       })
       .map((e) => e.filename);
 
     insertedResultCSVFiles = files
       .filter((e) => {
-        const pattern = /^csv:result:.+$/;
-        return pattern.test(e.key);
+        const pattern = /^H\d+-MRK\.CSV$/i;
+        return pattern.test(e.filename);
       })
       .map((e) => e.filename);
+      
   };
 
   const onInit = async () => {
@@ -104,7 +97,7 @@
     // console.log("division master file",divisionRep)
     // console.log("subjectMaster data..", ldata);
 
-    // console.log("csv files data is: ", data);
+    console.log("csv files data is: ", data);
     resultData = [...data];
 
     subjectMaster = [...ldata];
@@ -160,6 +153,7 @@
     } finally {
       const { error, errorMsg, data } = await api.getResultCSVFilesData();
       if (error) return;
+      
       resultData = [...data];
 
       fileUploading = false;
@@ -330,15 +324,11 @@
   const getPublish = async () => {
     try {
       let { error, errorMsg, publish: lpublish } = await api.getPublish({});
-      // console.log("result is ", lpublish);
-      // insertMessage = message;
+    
       if (lpublish == null) lpublish = "false";
 
       publish = lpublish;
-      // iMessage = true;
-      // setTimeout(() => {
-      //   iMessage = false;
-      // }, 3000);
+     
       if (error) {
         console.log(
           "failed to publish  : ",
@@ -921,21 +911,7 @@
         />
 
         <div class="ml-2 text-blue-700 flex gap-2 mt-2">
-          <!-- HSC_Result_Data -->
-          <!-- <span class="">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </span> -->
+         
         </div>
         {#if fileUploading == false}
           <button
